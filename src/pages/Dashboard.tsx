@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
-import BackButton from '../components/BackButton';
-import RoundIcon from '../components/RoundIcon';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import StatusCard from '../components/StatusCard';
@@ -12,7 +10,7 @@ const STATUS_CARDS = [
   {
     key: 'high',
     label: 'High Risk Projects',
-    count: 5,
+    count: 2,
     desc: 'Immediate attention required',
     color: '#c62828',
     icon: <Ionicons name="alert-circle-outline" size={36} color="#c62828" />,
@@ -20,7 +18,7 @@ const STATUS_CARDS = [
   {
     key: 'medium',
     label: 'Medium Risk Projects',
-    count: 0,
+    count: 2,
     desc: 'Monitor progress closely',
     color: '#f9a825',
     icon: <Ionicons name="time-outline" size={36} color="#f9a825" />,
@@ -28,7 +26,7 @@ const STATUS_CARDS = [
   {
     key: 'low',
     label: 'Low Risk Projects',
-    count: 6,
+    count: 4,
     desc: 'Stable and on track',
     color: '#2ecc40',
     icon: <Ionicons name="checkmark-circle-outline" size={36} color="#2ecc40" />,
@@ -38,10 +36,14 @@ const STATUS_CARDS = [
 const PROJECTS: { name: string; risk: RiskLevel }[] = [
   { name: 'Defect Tracker', risk: 'high' },
   { name: 'QA testing', risk: 'high' },
+  { name: 'API Integration', risk: 'medium' },
+  { name: 'Database Migration', risk: 'medium' },
   { name: 'project 1', risk: 'low' },
   { name: 'Heart', risk: 'low' },
-  { name: 'Project X', risk: 'low' },
-  { name: 'Project Y', risk: 'low' },
+  { name: 'Dashboard testing', risk: 'low' },
+  { name: 'JALI', risk: 'low' },
+  { name: 'Hello world', risk: 'medium' },
+  { name: 'dashboard test', risk: 'low' },
 ];
 
 const RISK_COLORS = {
@@ -69,6 +71,19 @@ const FILTERS = [
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_MARGIN = 10;
 const PROJECT_CARD_SIZE = Math.max((SCREEN_WIDTH - 4 * CARD_MARGIN) / 2, 140);
+
+const getProjectIcon = (risk: RiskLevel) => {
+  switch (risk) {
+    case 'high':
+      return <Ionicons name="warning" size={48} color="#fff" />;
+    case 'medium':
+      return <Ionicons name="time" size={48} color="#fff" />;
+    case 'low':
+      return <Ionicons name="checkmark-circle" size={48} color="#fff" />;
+    default:
+      return <Ionicons name="folder" size={48} color="#fff" />;
+  }
+};
 
 const Dashboard = () => {
   const navigation = useNavigation();
@@ -101,7 +116,6 @@ const Dashboard = () => {
       </View>
 
       <View style={styles.projectsSection}>
-        <Text style={styles.sectionTitle}>All Projects</Text>
         <View style={styles.filtersRow}>
           {FILTERS.map((filter) => (
             <TouchableOpacity
@@ -127,25 +141,23 @@ const Dashboard = () => {
             </TouchableOpacity>
           ))}
         </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.projectsRowScroll}>
-          <View style={styles.projectsRow}>
-            {filteredProjects.length === 0 ? (
-              <Text style={styles.noProjectsText}>No projects found for this filter.</Text>
-            ) : (
-              filteredProjects.map((project, idx) => (
-                <ProjectCard
-                  key={project.name + idx}
-                  name={project.name}
-                  risk={project.risk}
-                  riskColor={RISK_COLORS[project.risk] || '#1a2a5c'}
-                  riskLabel={RISK_LABELS[project.risk]}
-                  icon={<Ionicons name="checkmark-done-outline" size={48} color="#fff" />}
-                  size={PROJECT_CARD_SIZE}
-                />
-              ))
-            )}
-          </View>
-        </ScrollView>
+        <View style={styles.projectsRow}>
+          {filteredProjects.length === 0 ? (
+            <Text style={styles.noProjectsText}>No projects found for this filter.</Text>
+          ) : (
+            filteredProjects.map((project, idx) => (
+              <ProjectCard
+                key={project.name + idx}
+                name={project.name}
+                risk={project.risk}
+                riskColor={RISK_COLORS[project.risk] || '#1a2a5c'}
+                riskLabel={RISK_LABELS[project.risk]}
+                icon={getProjectIcon(project.risk)}
+                size={PROJECT_CARD_SIZE}
+              />
+            ))
+          )}
+        </View>
       </View>
     </ScrollView>
   );
@@ -229,7 +241,7 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#1a2a5c',
     marginBottom: 12,
@@ -239,30 +251,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-start',
     marginBottom: 18,
-    marginLeft: 2,
-    flexWrap: 'wrap',
+    marginLeft: 1,
+    flexWrap: 'nowrap',
   },
   filterButton: {
-    backgroundColor: '#f3f4f6',
-    borderRadius: 18,
-    paddingVertical: 8,
-    paddingHorizontal: 18,
-    marginRight: 10,
+    backgroundColor: '#e4e6ebff',
+    borderRadius: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 4,
+    margin: 4,
     borderWidth: 1.5,
     borderColor: 'transparent',
-    marginBottom: 8,
   },
   filterButtonActive: {
     backgroundColor: '#e6eeff',
   },
   filterButtonText: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: 'bold',
     color: '#1a2a5c',
   },
   filterButtonTextActive: {
     color: '#1a2a5c',
-    textDecorationLine: 'underline',
+    fontWeight: 'bold',
   },
   projectsRowScroll: {
     flexDirection: 'row',
@@ -319,6 +330,28 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginLeft: 8,
   },
+  projectSelectorContainer: {
+    backgroundColor: '#fff',
+    marginHorizontal: 0,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 1,
+  },
 });
 
 export default Dashboard;
+
+
+
+
+
+
+
+
+
+
+
