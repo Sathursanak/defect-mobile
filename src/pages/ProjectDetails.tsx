@@ -4,6 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import Header from '../components/Header';
 import ProjectSelector from '../components/ProjectSelector';
 import SeverityBreakdown from '../components/SeverityBreakdown';
+import DefectIndicators from './DefectIndicators';
 
 type RootStackParamList = {
   ProjectDetails: {
@@ -200,6 +201,10 @@ const ProjectDetails = () => {
       </View>
 
       <SeverityBreakdown defectData={defectData} />
+
+      <View style={styles.indicatorsContainer}>
+        <DefectIndicators defectData={defectData} />
+      </View>
     </ScrollView>
   );
 };
@@ -322,6 +327,9 @@ const styles = StyleSheet.create({
     color: '#3b82f6',
     fontSize: 14,
     fontWeight: '500',
+  },
+  indicatorsContainer: {
+    marginBottom: 20,
   },
 });
 

@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  Dimensions,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface DefectData {
@@ -23,9 +30,13 @@ interface SeverityBreakdownProps {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({ defectData }) => {
+const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
+  defectData,
+}) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedSeverity, setSelectedSeverity] = useState<'high' | 'medium' | 'low'>('high');
+  const [selectedSeverity, setSelectedSeverity] = useState<
+    'high' | 'medium' | 'low'
+  >('high');
 
   const handleViewChart = (severity: 'high' | 'medium' | 'low') => {
     setSelectedSeverity(severity);
@@ -46,42 +57,21 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({ defectData }) => 
 
     return (
       <View style={styles.pieChartContainer}>
-        <View style={styles.pieChart}>
-          <View style={styles.pieCircle}>
-            {segments.map((segment, index) => {
-              const percentage = (segment.value / total) * 100;
-              let cumulativePercentage = 0;
-              for (let i = 0; i < index; i++) {
-                cumulativePercentage += (segments[i].value / total) * 100;
-              }
-              const rotation = (cumulativePercentage / 100) * 360;
-              const borderWidth = (percentage / 100) * 160;
-
-              return (
-                <View
-                  key={index}
-                  style={[
-                    styles.pieSlice,
-                    {
-                      borderTopColor: segment.color,
-                      transform: [{ rotate: `${rotation}deg` }],
-                      borderTopWidth: borderWidth / 4,
-                      borderRightWidth: percentage > 25 ? borderWidth / 4 : 0,
-                      borderBottomWidth: percentage > 50 ? borderWidth / 4 : 0,
-                      borderLeftWidth: percentage > 75 ? borderWidth / 4 : 0,
-                    }
-                  ]}
-                />
-              );
-            })}
-          </View>
+        <View style={styles.totalSection}>
+          <Text style={styles.totalLabel}>Total Defects</Text>
+          <Text style={styles.totalValue}>{total}</Text>
         </View>
-        
+
         <View style={styles.chartLegend}>
           {segments.map((segment, index) => (
             <View key={index} style={styles.legendRow}>
               <View style={styles.legendItem}>
-                <View style={[styles.legendSquare, { backgroundColor: segment.color }]} />
+                <View
+                  style={[
+                    styles.legendSquare,
+                    { backgroundColor: segment.color },
+                  ]}
+                />
                 <Text style={styles.legendText}>{segment.label}</Text>
               </View>
               <Text style={styles.legendValue}>
@@ -103,17 +93,20 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({ defectData }) => 
   return (
     <View>
       <Text style={styles.sectionTitle}>Defect Severity Breakdown</Text>
-      
+
       <View style={styles.defectCardsContainer}>
         {severityConfig.map(({ key, title, color }) => {
           const data = defectData[key as keyof typeof defectData];
           return (
-            <View key={key} style={[styles.defectCard, { borderTopColor: color }]}>
+            <View
+              key={key}
+              style={[styles.defectCard, { borderTopColor: color }]}
+            >
               <View style={styles.cardHeader}>
                 <Text style={[styles.defectCardTitle, { color }]}>{title}</Text>
                 <Text style={styles.defectTotal}>{data.total}</Text>
               </View>
-              
+
               <View style={styles.defectStatsGrid}>
                 <View style={styles.statItem}>
                   <View style={[styles.dot, { backgroundColor: '#c62828' }]} />
@@ -136,12 +129,19 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({ defectData }) => 
                   <Text style={styles.statValue}>{data.fixed}</Text>
                 </View>
               </View>
-              
-              <TouchableOpacity 
-                style={[styles.viewChartButton, { backgroundColor: color + '20', borderColor: color }]}
-                onPress={() => handleViewChart(key as 'high' | 'medium' | 'low')}
+
+              <TouchableOpacity
+                style={[
+                  styles.viewChartButton,
+                  { backgroundColor: color + '20', borderColor: color },
+                ]}
+                onPress={() =>
+                  handleViewChart(key as 'high' | 'medium' | 'low')
+                }
               >
-                <Text style={[styles.viewChartText, { color }]}>View Chart</Text>
+                <Text style={[styles.viewChartText, { color }]}>
+                  View Chart
+                </Text>
               </TouchableOpacity>
             </View>
           );
@@ -158,7 +158,8 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({ defectData }) => 
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {severityConfig.find(s => s.key === selectedSeverity)?.title} Chart
+                {severityConfig.find(s => s.key === selectedSeverity)?.title}{' '}
+                Chart
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#6b7280" />
@@ -333,17 +334,25 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     fontWeight: '500',
   },
+  totalSection: {
+    alignItems: 'center',
+    marginBottom: 30,
+    paddingVertical: 20,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 12,
+    marginHorizontal: 20,
+  },
+  totalLabel: {
+    fontSize: 16,
+    color: '#6b7280',
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  totalValue: {
+    fontSize: 32,
+    color: '#1a2a5c',
+    fontWeight: 'bold',
+  },
 });
 
 export default SeverityBreakdown;
-
-
-
-
-
-
-
-
-
-
-
