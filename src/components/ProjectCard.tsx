@@ -12,7 +12,7 @@ interface ProjectCardProps {
   style?: ViewStyle;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ name, risk, riskColor, riskLabel, icon, size, style }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ name, risk, riskColor, icon, size, style }) => {
   const navigation = useNavigation();
 
   const handlePress = () => {

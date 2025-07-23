@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import StatusCard from '../components/StatusCard';
@@ -29,7 +36,9 @@ const STATUS_CARDS = [
     count: 4,
     desc: 'Stable and on track',
     color: '#2ecc40',
-    icon: <Ionicons name="checkmark-circle-outline" size={36} color="#2ecc40" />,
+    icon: (
+      <Ionicons name="checkmark-circle-outline" size={36} color="#2ecc40" />
+    ),
   },
 ];
 
@@ -91,19 +100,23 @@ const Dashboard = () => {
 
   const filteredProjects =
     selectedFilter === 'all'
-      ? PROJECTS
-      : PROJECTS.filter((p) => p.risk === selectedFilter);
+      ? PROJECTS.sort((a, b) => {
+          const riskOrder = { high: 0, medium: 1, low: 2 };
+          return riskOrder[a.risk] - riskOrder[b.risk];
+        })
+      : PROJECTS.filter(p => p.risk === selectedFilter);
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
       <Header title="Dashboard Overview" onBack={() => navigation.goBack()}>
         <Text style={styles.subtitle}>
-          Gain insights into your projects with real-time health metrics and status summaries
+          Gain insights into your projects with real-time health metrics and
+          status summaries
         </Text>
       </Header>
 
       <View style={styles.statusCardsRow}>
-        {STATUS_CARDS.map((card) => (
+        {STATUS_CARDS.map(card => (
           <StatusCard
             key={card.key}
             icon={card.icon}
@@ -117,12 +130,17 @@ const Dashboard = () => {
 
       <View style={styles.projectsSection}>
         <View style={styles.filtersRow}>
-          {FILTERS.map((filter) => (
+          {FILTERS.map(filter => (
             <TouchableOpacity
               key={filter.key}
               style={[
                 styles.filterButton,
-                selectedFilter === filter.key && [styles.filterButtonActive, filter.key === 'high' && { borderColor: '#c62828' }, filter.key === 'medium' && { borderColor: '#f9a825' }, filter.key === 'low' && { borderColor: '#2ecc40' }],
+                selectedFilter === filter.key && [
+                  styles.filterButtonActive,
+                  filter.key === 'high' && { borderColor: '#c62828' },
+                  filter.key === 'medium' && { borderColor: '#f9a825' },
+                  filter.key === 'low' && { borderColor: '#2ecc40' },
+                ],
               ]}
               onPress={() => setSelectedFilter(filter.key)}
               activeOpacity={0.8}
@@ -130,7 +148,8 @@ const Dashboard = () => {
               <Text
                 style={[
                   styles.filterButtonText,
-                  selectedFilter === filter.key && styles.filterButtonTextActive,
+                  selectedFilter === filter.key &&
+                    styles.filterButtonTextActive,
                   filter.key === 'high' && { color: '#c62828' },
                   filter.key === 'medium' && { color: '#f9a825' },
                   filter.key === 'low' && { color: '#2ecc40' },
@@ -143,7 +162,9 @@ const Dashboard = () => {
         </View>
         <View style={styles.projectsRow}>
           {filteredProjects.length === 0 ? (
-            <Text style={styles.noProjectsText}>No projects found for this filter.</Text>
+            <Text style={styles.noProjectsText}>
+              No projects found for this filter.
+            </Text>
           ) : (
             filteredProjects.map((project, idx) => (
               <ProjectCard
@@ -292,13 +313,13 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     padding: 8,
     shadowColor: '#000',
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 3,
   },
   projectCircleShadow: {
     shadowColor: '#000',
-    shadowOpacity: 0.10,
+    shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 3,
   },
@@ -344,14 +365,3 @@ const styles = StyleSheet.create({
 });
 
 export default Dashboard;
-
-
-
-
-
-
-
-
-
-
-
