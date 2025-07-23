@@ -13,35 +13,6 @@ import StatusCard from '../components/StatusCard';
 import ProjectCard from '../components/ProjectCard';
 import Header from '../components/Header';
 
-const STATUS_CARDS = [
-  {
-    key: 'high',
-    label: 'High Risk Projects',
-    count: 2,
-    desc: 'Immediate attention required',
-    color: '#c62828',
-    icon: <Ionicons name="alert-circle-outline" size={36} color="#c62828" />,
-  },
-  {
-    key: 'medium',
-    label: 'Medium Risk Projects',
-    count: 2,
-    desc: 'Monitor progress closely',
-    color: '#f9a825',
-    icon: <Ionicons name="time-outline" size={36} color="#f9a825" />,
-  },
-  {
-    key: 'low',
-    label: 'Low Risk Projects',
-    count: 4,
-    desc: 'Stable and on track',
-    color: '#2ecc40',
-    icon: (
-      <Ionicons name="checkmark-circle-outline" size={36} color="#2ecc40" />
-    ),
-  },
-];
-
 const PROJECTS: { name: string; risk: RiskLevel }[] = [
   { name: 'Defect Tracker', risk: 'high' },
   { name: 'QA testing', risk: 'high' },
@@ -98,6 +69,43 @@ const Dashboard = () => {
   const navigation = useNavigation();
   const [selectedFilter, setSelectedFilter] = useState('all');
 
+  // Calculate dynamic counts for each risk level
+  const projectCounts = {
+    high: PROJECTS.filter(p => p.risk === 'high').length,
+    medium: PROJECTS.filter(p => p.risk === 'medium').length,
+    low: PROJECTS.filter(p => p.risk === 'low').length,
+  };
+
+  // Create status cards with dynamic counts
+  const statusCards = [
+    {
+      key: 'high',
+      label: 'High Risk Projects',
+      count: projectCounts.high,
+      desc: 'Immediate attention required',
+      color: '#c62828',
+      icon: <Ionicons name="alert-circle-outline" size={36} color="#c62828" />,
+    },
+    {
+      key: 'medium',
+      label: 'Medium Risk Projects',
+      count: projectCounts.medium,
+      desc: 'Monitor progress closely',
+      color: '#f9a825',
+      icon: <Ionicons name="time-outline" size={36} color="#f9a825" />,
+    },
+    {
+      key: 'low',
+      label: 'Low Risk Projects',
+      count: projectCounts.low,
+      desc: 'Stable and on track',
+      color: '#2ecc40',
+      icon: (
+        <Ionicons name="checkmark-circle-outline" size={36} color="#2ecc40" />
+      ),
+    },
+  ];
+
   const filteredProjects =
     selectedFilter === 'all'
       ? PROJECTS.sort((a, b) => {
@@ -116,7 +124,7 @@ const Dashboard = () => {
       </Header>
 
       <View style={styles.statusCardsRow}>
-        {STATUS_CARDS.map(card => (
+        {statusCards.map(card => (
           <StatusCard
             key={card.key}
             icon={card.icon}
