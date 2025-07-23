@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import DefectDensityMeter from '../components/DefectDensityMeter';
 
 interface DefectData {
   total: number;
@@ -30,7 +31,6 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
   const linesOfCode = 15000; // Mock lines of code
   const defectDensity =
     linesOfCode > 0 ? ((totalDefects / linesOfCode) * 1000).toFixed(2) : '0.00';
-  const defectDensityPercentage = (parseFloat(defectDensity) / 50) * 100; // Assuming 50 defects per 1000 LOC is max
 
   // Defect Severity Index (weighted average: High=3, Medium=2, Low=1)
   const severityIndex =
@@ -104,39 +104,17 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
     { module: 'API', count: Math.floor(totalDefects * 0.1), color: '#8b5cf6' },
   ];
 
-  // Render meter component for defect density
-  const renderMeter = (percentage: number, color: string) => {
-    const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
-    return (
-      <View style={styles.meterContainer}>
-        <View style={styles.meterTrack}>
-          <View
-            style={[
-              styles.meterFill,
-              { width: `${clampedPercentage}%`, backgroundColor: color },
-            ]}
-          />
-        </View>
-        <Text style={styles.meterText}>{clampedPercentage.toFixed(1)}%</Text>
-      </View>
-    );
-  };
-
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.pageTitle}>Defect Indicators</Text>
 
       {/* Defect Density with Meter */}
       <View style={styles.indicatorContainer}>
-        <View style={styles.containerHeader}>
-          <Ionicons name="speedometer-outline" size={24} color="#3b82f6" />
-          <Text style={styles.containerTitle}>Defect Density</Text>
-        </View>
-        <Text style={styles.metricValue}>{defectDensity} defects/1000 LOC</Text>
-        {renderMeter(defectDensityPercentage, '#3b82f6')}
-        <Text style={styles.metricDescription}>
-          Total defects per 1000 lines of code
-        </Text>
+        <DefectDensityMeter
+          value={parseFloat(defectDensity)}
+          size={180}
+          title="Defect Density"
+        />
       </View>
 
       {/* Defect Severity Index */}
@@ -297,25 +275,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     marginTop: 8,
   },
-  meterContainer: {
-    marginVertical: 12,
-  },
-  meterTrack: {
-    height: 8,
-    backgroundColor: '#e5e7eb',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  meterFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  meterText: {
-    fontSize: 12,
-    color: '#6b7280',
-    textAlign: 'right',
-    marginTop: 4,
-  },
+
   distributionList: {
     marginTop: 12,
   },
