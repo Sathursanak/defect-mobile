@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import ProjectSelector from '../components/ProjectSelector';
 import SeverityBreakdown from '../components/SeverityBreakdown';
 import DefectIndicators from './DefectIndicators';
+import { mockProjects, getProjectData } from '../data/mockData';
 
 type RootStackParamList = {
   ProjectDetails: {
@@ -22,18 +23,7 @@ const ProjectDetails = () => {
 
   const [selectedProject, setSelectedProject] = useState(initialProject);
 
-  const allProjects = [
-    'Defect Tracker',
-    'QA testing',
-    'API Integration',
-    'Database Migration',
-    'project 1',
-    'Heart',
-    'Dashboard testing',
-    'JALI',
-    'Hello world',
-    'dashboard test',
-  ];
+  const allProjects = mockProjects.map(project => project.name);
 
   const getProjectRisk = (projectName: string) => {
     const projectRiskMap: Record<string, string> = {
@@ -57,7 +47,45 @@ const ProjectDetails = () => {
     setSelectedProject(project);
   };
 
-  const getDefectData = (risk: string) => {
+  const getDefectData = () => {
+    const projectData = getProjectData(selectedProject);
+    return projectData
+      ? projectData.defectData
+      : {
+          high: {
+            total: 0,
+            reopen: 0,
+            closed: 0,
+            new: 0,
+            reject: 0,
+            open: 0,
+            duplicate: 0,
+            fixed: 0,
+          },
+          medium: {
+            total: 0,
+            reopen: 0,
+            closed: 0,
+            new: 0,
+            reject: 0,
+            open: 0,
+            duplicate: 0,
+            fixed: 0,
+          },
+          low: {
+            total: 0,
+            reopen: 0,
+            closed: 0,
+            new: 0,
+            reject: 0,
+            open: 0,
+            duplicate: 0,
+            fixed: 0,
+          },
+        };
+  };
+
+  const getDefectDataOld = (risk: string) => {
     switch (risk) {
       case 'high':
         return {
@@ -161,7 +189,7 @@ const ProjectDetails = () => {
     }
   };
 
-  const defectData = getDefectData(currentRisk);
+  const defectData = getDefectData();
 
   return (
     <ScrollView style={styles.container}>

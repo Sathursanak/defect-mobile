@@ -9,6 +9,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import BackButton from './BackButton';
+import NotificationBell from './NotificationBell';
 
 interface HeaderProps {
   title?: string;
@@ -40,14 +41,17 @@ const Header: React.FC<HeaderProps> = ({
       {onBack && <BackButton onPress={onBack} style={styles.backButton} />}
       {title && <Text style={styles.title}>{title}</Text>}
       {showLogout && (
-        <TouchableOpacity
-          style={styles.logoutButton}
-          onPress={handleLogout}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="log-out-outline" size={24} color="#1a2a5c" />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
+        <View style={styles.rightActions}>
+          <NotificationBell />
+          <TouchableOpacity
+            style={styles.logoutButton}
+            onPress={handleLogout}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="log-out-outline" size={24} color="#1a2a5c" />
+            <Text style={styles.logoutText}>Logout</Text>
+          </TouchableOpacity>
+        </View>
       )}
       {children}
     </View>
@@ -77,13 +81,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 8,
   },
-  logoutButton: {
+  rightActions: {
     position: 'absolute',
     top: 28,
     right: 16,
     flexDirection: 'row',
     alignItems: 'center',
     zIndex: 2,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   logoutText: {
     color: '#1a2a5c',

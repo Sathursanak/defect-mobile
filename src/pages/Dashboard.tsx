@@ -12,19 +12,14 @@ import { useNavigation } from '@react-navigation/native';
 import StatusCard from '../components/StatusCard';
 import ProjectCard from '../components/ProjectCard';
 import Header from '../components/Header';
+import { mockProjects } from '../data/mockData';
 
-const PROJECTS: { name: string; risk: RiskLevel }[] = [
-  { name: 'Defect Tracker', risk: 'high' },
-  { name: 'QA testing', risk: 'high' },
-  { name: 'API Integration', risk: 'medium' },
-  { name: 'Database Migration', risk: 'medium' },
-  { name: 'project 1', risk: 'low' },
-  { name: 'Heart', risk: 'low' },
-  { name: 'Dashboard testing', risk: 'low' },
-  { name: 'JALI', risk: 'low' },
-  { name: 'Hello world', risk: 'medium' },
-  { name: 'dashboard test', risk: 'low' },
-];
+const PROJECTS: { name: string; risk: RiskLevel }[] = mockProjects.map(
+  project => ({
+    name: project.name,
+    risk: project.risk,
+  }),
+);
 
 const RISK_COLORS = {
   high: '#c62828',
