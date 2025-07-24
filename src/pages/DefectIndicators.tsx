@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DefectDensityMeter from '../components/DefectDensityMeter';
+import DefectPieCharts from '../components/DefectPieCharts';
 
 interface DefectData {
   total: number;
@@ -143,16 +144,7 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
 
       {/* Defects Reopened Multiple Times */}
       <View style={styles.indicatorContainer}>
-        <View style={styles.containerHeader}>
-          <Ionicons name="refresh-circle-outline" size={24} color="#ef4444" />
-          <Text style={styles.containerTitle}>
-            Defects Reopened Multiple Times
-          </Text>
-        </View>
-        <Text style={styles.metricValue}>{multipleReopenDefects}</Text>
-        <Text style={styles.metricDescription}>
-          Defects that have been reopened more than once
-        </Text>
+        <DefectPieCharts />
       </View>
 
       {/* Defect Distribution by Type */}
