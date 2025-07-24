@@ -165,7 +165,10 @@ const ProjectDetails = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Header title="Project Selection" onBack={() => navigation.goBack()} />
+      <Header
+        title={`${selectedProject} Details`}
+        onBack={() => navigation.goBack()}
+      />
 
       <View style={styles.projectSelectorContainer}>
         <ProjectSelector
