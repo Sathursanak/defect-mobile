@@ -152,13 +152,17 @@ const SeverityIndexIndicator: React.FC<SeverityIndexIndicatorProps> = ({
             );
           })}
         </Svg>
+
+        {/* Number display inside the round */}
+        <View style={styles.numberContainer}>
+          <Text style={[styles.valueText, { color: indicatorColor }]}>
+            {displayValue}
+          </Text>
+        </View>
       </View>
 
-      {/* Value display */}
-      <View style={styles.valueContainer}>
-        <Text style={[styles.valueText, { color: indicatorColor }]}>
-          {displayValue}
-        </Text>
+      {/* Description text below the round */}
+      <View style={styles.descriptionContainer}>
         <Text style={styles.valueLabel}>
           Weighted severity score (higher = more severe defects)
         </Text>
@@ -183,6 +187,19 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  numberContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  descriptionContainer: {
+    alignItems: 'center',
+    marginTop: 20,
   },
   valueContainer: {
     alignItems: 'center',
