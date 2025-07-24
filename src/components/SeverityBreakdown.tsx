@@ -31,6 +31,13 @@ interface SeverityBreakdownProps {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+// Calculate responsive card width based on screen size
+const getCardWidth = () => {
+  const availableWidth = SCREEN_WIDTH - 48; // Account for padding and gaps
+  const cardWidth = availableWidth / 3;
+  return Math.max(cardWidth, 100); // Minimum width of 100
+};
+
 const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
   defectData,
 }) => {
@@ -123,29 +130,59 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
               style={[styles.defectCard, { borderTopColor: color }]}
             >
               <View style={styles.cardHeader}>
-                <Text style={[styles.defectCardTitle, { color }]}>{title}</Text>
+                <Text
+                  style={[styles.defectCardTitle, { color }]}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                >
+                  {title}
+                </Text>
                 <Text style={styles.defectTotal}>{data.total}</Text>
               </View>
 
               <View style={styles.defectStatsGrid}>
                 <View style={styles.statItem}>
                   <View style={[styles.dot, { backgroundColor: '#c62828' }]} />
-                  <Text style={styles.statText}>REOPEN</Text>
+                  <Text
+                    style={styles.statText}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    REOPEN
+                  </Text>
                   <Text style={styles.statValue}>{data.reopen}</Text>
                 </View>
                 <View style={styles.statItem}>
                   <View style={[styles.dot, { backgroundColor: '#2ecc40' }]} />
-                  <Text style={styles.statText}>CLOSED</Text>
+                  <Text
+                    style={styles.statText}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    CLOSED
+                  </Text>
                   <Text style={styles.statValue}>{data.closed}</Text>
                 </View>
                 <View style={styles.statItem}>
                   <View style={[styles.dot, { backgroundColor: '#f9a825' }]} />
-                  <Text style={styles.statText}>NEW</Text>
+                  <Text
+                    style={styles.statText}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    NEW
+                  </Text>
                   <Text style={styles.statValue}>{data.new}</Text>
                 </View>
                 <View style={styles.statItem}>
                   <View style={[styles.dot, { backgroundColor: '#3b82f6' }]} />
-                  <Text style={styles.statText}>FIXED</Text>
+                  <Text
+                    style={styles.statText}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    FIXED
+                  </Text>
                   <Text style={styles.statValue}>{data.fixed}</Text>
                 </View>
               </View>
@@ -203,71 +240,83 @@ const styles = StyleSheet.create({
   },
   defectCardsContainer: {
     flexDirection: 'row',
-    paddingHorizontal: 8,
-    gap: 4,
+    paddingHorizontal: 12,
+    gap: 8,
+    justifyContent: 'space-between',
   },
   defectCard: {
     flex: 1,
     backgroundColor: '#fff',
     borderRadius: 8,
-    padding: 8,
+    padding: 12,
     borderTopWidth: 3,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 2,
-    maxWidth: (SCREEN_WIDTH - 32) / 3,
+    minHeight: 160,
+    maxWidth: getCardWidth(),
   },
   cardHeader: {
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
+    paddingHorizontal: 4,
   },
   defectCardTitle: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 2,
+    marginBottom: 6,
+    lineHeight: 16,
   },
   defectTotal: {
-    fontSize: 22,
+    fontSize: 20,
     color: '#1a2a5c',
     fontWeight: 'bold',
   },
   defectStatsGrid: {
-    marginBottom: 8,
+    marginBottom: 12,
+    paddingHorizontal: 2,
   },
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 2,
+    marginBottom: 4,
+    paddingVertical: 1,
   },
   dot: {
-    width: 8,
-    height: 8,
+    width: 6,
+    height: 6,
     borderRadius: 3,
-    marginRight: 4,
+    marginRight: 6,
+    flexShrink: 0,
   },
   statText: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#6b7280',
     fontWeight: '500',
     flex: 1,
+    textAlign: 'left',
   },
   statValue: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#1a2a5c',
     fontWeight: 'bold',
+    minWidth: 20,
+    textAlign: 'right',
   },
   viewChartButton: {
     alignSelf: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     borderWidth: 1,
+    marginTop: 4,
+    minWidth: 80,
   },
   viewChartText: {
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: '600',
     textAlign: 'center',
   },
@@ -282,7 +331,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     width: SCREEN_WIDTH * 0.9,
-    maxHeight: '70%',
+    maxHeight: '90%',
   },
   modalHeader: {
     flexDirection: 'row',
@@ -297,7 +346,7 @@ const styles = StyleSheet.create({
   },
   pieChartContainer: {
     alignItems: 'center',
-    paddingVertical: 20,
+    
   },
   pieChart: {
     width: 200,
@@ -375,7 +424,6 @@ const styles = StyleSheet.create({
   },
   pieChartWrapper: {
     alignItems: 'center',
-    marginVertical: 20,
   },
 });
 
