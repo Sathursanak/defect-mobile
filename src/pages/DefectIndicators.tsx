@@ -6,6 +6,9 @@ import SeverityIndexIndicator from '../components/SeverityIndexIndicator';
 import DefectRemarkRatioCard from '../components/DefectRemarkRatioCard';
 import DefectsReopenedChart from '../components/DefectsReopenedChart';
 import DefectDistributionChart from '../components/DefectDistributionChart';
+import TimeToFindChart from '../components/TimeToFindChart';
+import TimeToFixChart from '../components/TimeToFixChart';
+import DefectsByModuleChart from '../components/DefectsByModuleChart';
 
 interface DefectData {
   total: number;
@@ -49,35 +52,6 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
 
   // Mock data for other metrics
   const totalRemarks = 45; // Mock total remarks
-
-  // Time metrics (in hours)
-  const avgTimeToFind = 24.5;
-  const avgTimeToFix = 18.2;
-
-  // Defects by module (mock data)
-  const moduleDefects = [
-    {
-      module: 'Authentication',
-      count: Math.floor(totalDefects * 0.3),
-      color: '#3b82f6',
-    },
-    {
-      module: 'Dashboard',
-      count: Math.floor(totalDefects * 0.25),
-      color: '#10b981',
-    },
-    {
-      module: 'Reports',
-      count: Math.floor(totalDefects * 0.2),
-      color: '#f59e0b',
-    },
-    {
-      module: 'Settings',
-      count: Math.floor(totalDefects * 0.15),
-      color: '#ef4444',
-    },
-    { module: 'API', count: Math.floor(totalDefects * 0.1), color: '#8b5cf6' },
-  ];
 
   return (
     <ScrollView style={styles.container}>
@@ -133,49 +107,37 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
       {/* Time to Find Defects */}
       <View style={styles.indicatorContainer}>
         <View style={styles.containerHeader}>
-          <Ionicons name="time-outline" size={24} color="#06b6d4" />
+          <Ionicons name="time-outline" size={24} color="#3b82f6" />
           <Text style={styles.containerTitle}>Time to Find Defects</Text>
         </View>
-        <Text style={styles.metricValue}>{avgTimeToFind} hours</Text>
+        <TimeToFindChart />
         <Text style={styles.metricDescription}>
-          Average time from code deployment to defect discovery
+          Daily trend of defects discovered over time
         </Text>
       </View>
 
       {/* Time to Fix Defects */}
       <View style={styles.indicatorContainer}>
         <View style={styles.containerHeader}>
-          <Ionicons name="build-outline" size={24} color="#84cc16" />
+          <Ionicons name="build-outline" size={24} color="#10b981" />
           <Text style={styles.containerTitle}>Time to Fix Defects</Text>
         </View>
-        <Text style={styles.metricValue}>{avgTimeToFix} hours</Text>
+        <TimeToFixChart />
         <Text style={styles.metricDescription}>
-          Average time from defect assignment to resolution
+          Daily trend of defects fixed over time
         </Text>
       </View>
 
       {/* Defects by Module */}
       <View style={styles.indicatorContainer}>
         <View style={styles.containerHeader}>
-          <Ionicons name="layers-outline" size={24} color="#f97316" />
+          <Ionicons name="layers-outline" size={24} color="#f59e0b" />
           <Text style={styles.containerTitle}>Defects by Module</Text>
         </View>
-        <View style={styles.distributionList}>
-          {moduleDefects.map((module, index) => (
-            <View key={index} style={styles.distributionItem}>
-              <View style={styles.distributionHeader}>
-                <View
-                  style={[
-                    styles.distributionDot,
-                    { backgroundColor: module.color },
-                  ]}
-                />
-                <Text style={styles.distributionLabel}>{module.module}</Text>
-              </View>
-              <Text style={styles.distributionValue}>{module.count}</Text>
-            </View>
-          ))}
-        </View>
+        <DefectsByModuleChart />
+        <Text style={styles.metricDescription}>
+          Distribution of defects across different modules
+        </Text>
       </View>
     </ScrollView>
   );
