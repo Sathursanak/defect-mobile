@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DefectDensityMeter from '../components/DefectDensityMeter';
 import DefectPieCharts from '../components/DefectPieCharts';
+import SeverityIndexIndicator from '../components/SeverityIndexIndicator';
 
 interface DefectData {
   total: number;
@@ -120,14 +121,11 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
 
       {/* Defect Severity Index */}
       <View style={styles.indicatorContainer}>
-        <View style={styles.containerHeader}>
-          <Ionicons name="warning-outline" size={24} color="#f59e0b" />
-          <Text style={styles.containerTitle}>Defect Severity Index</Text>
-        </View>
-        <Text style={styles.metricValue}>{severityIndex}</Text>
-        <Text style={styles.metricDescription}>
-          Weighted average severity (High=3, Medium=2, Low=1)
-        </Text>
+        <SeverityIndexIndicator
+          value={parseFloat(severityIndex)}
+          size={200}
+          title="Defect Severity Index"
+        />
       </View>
 
       {/* Defect to Remark Ratio */}
