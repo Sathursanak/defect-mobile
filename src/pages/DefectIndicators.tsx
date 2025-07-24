@@ -59,28 +59,40 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
 
       {/* Defect Density with Meter */}
       <View style={styles.indicatorContainer}>
+        <View style={styles.containerHeader}>
+          <Ionicons name="speedometer-outline" size={24} color="#06b6d4" />
+          <Text style={styles.containerTitle}>Defect Density</Text>
+        </View>
         <DefectDensityMeter
           value={parseFloat(defectDensity)}
           size={180}
-          title="Defect Density"
+          title=""
         />
       </View>
 
       {/* Defect Severity Index */}
       <View style={styles.indicatorContainer}>
+        <View style={styles.containerHeader}>
+          <Ionicons name="warning-outline" size={24} color="#f59e0b" />
+          <Text style={styles.containerTitle}>Defect Severity Index</Text>
+        </View>
         <SeverityIndexIndicator
           value={parseFloat(severityIndex)}
           size={200}
-          title="Defect Severity Index"
+          title=""
         />
       </View>
 
       {/* Defect to Remark Ratio */}
       <View style={styles.indicatorContainer}>
+        <View style={styles.containerHeader}>
+          <Ionicons name="chatbubbles-outline" size={24} color="#10b981" />
+          <Text style={styles.containerTitle}>Defect to Remark Ratio</Text>
+        </View>
         <DefectRemarkRatioCard
           defectCount={totalDefects}
           remarkCount={totalRemarks}
-          title="Defect to Remark Ratio"
+          title=""
         />
       </View>
 
