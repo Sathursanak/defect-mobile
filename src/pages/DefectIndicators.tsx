@@ -4,6 +4,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import DefectDensityMeter from '../components/DefectDensityMeter';
 import DefectPieCharts from '../components/DefectPieCharts';
 import SeverityIndexIndicator from '../components/SeverityIndexIndicator';
+import DefectRemarkRatioCard from '../components/DefectRemarkRatioCard';
 
 interface DefectData {
   total: number;
@@ -47,10 +48,6 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
 
   // Mock data for other metrics
   const totalRemarks = 45; // Mock total remarks
-  const defectToRemarkRatio =
-    totalRemarks > 0 ? (totalDefects / totalRemarks).toFixed(2) : '0.00';
-
-  const multipleReopenDefects = 8; // Mock defects reopened multiple times
 
   // Time metrics (in hours)
   const avgTimeToFind = 24.5;
@@ -130,14 +127,11 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
 
       {/* Defect to Remark Ratio */}
       <View style={styles.indicatorContainer}>
-        <View style={styles.containerHeader}>
-          <Ionicons name="chatbubbles-outline" size={24} color="#10b981" />
-          <Text style={styles.containerTitle}>Defect to Remark Ratio</Text>
-        </View>
-        <Text style={styles.metricValue}>{defectToRemarkRatio}:1</Text>
-        <Text style={styles.metricDescription}>
-          Ratio of defects to review remarks
-        </Text>
+        <DefectRemarkRatioCard
+          defectCount={totalDefects}
+          remarkCount={totalRemarks}
+          title="Defect to Remark Ratio"
+        />
       </View>
 
       {/* Defects Reopened Multiple Times */}
