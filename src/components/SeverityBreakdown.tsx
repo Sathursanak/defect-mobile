@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import PieChart from 'react-native-pie-chart';
 
 interface DefectData {
   total: number;
@@ -55,6 +56,13 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
       { value: data.duplicate, color: '#6b7280', label: 'DUPLICATE' },
     ].filter(segment => segment.value > 0);
 
+    // Prepare data for PieChart component
+    const widthAndHeight = 200;
+    const series = segments.map(segment => ({
+      value: segment.value,
+      color: segment.color,
+    }));
+
     return (
       <View style={styles.pieChartContainer}>
         <View style={styles.totalSection}>
@@ -62,6 +70,18 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
           <Text style={styles.totalValue}>{total}</Text>
         </View>
 
+        {/* Actual Pie Chart */}
+        {total > 0 && (
+          <View style={styles.pieChartWrapper}>
+            <PieChart
+              widthAndHeight={widthAndHeight}
+              series={series}
+              cover={{ radius: 0.45, color: '#FFF' }}
+            />
+          </View>
+        )}
+
+        {/* Legend */}
         <View style={styles.chartLegend}>
           {segments.map((segment, index) => (
             <View key={index} style={styles.legendRow}>
@@ -352,6 +372,10 @@ const styles = StyleSheet.create({
     fontSize: 32,
     color: '#1a2a5c',
     fontWeight: 'bold',
+  },
+  pieChartWrapper: {
+    alignItems: 'center',
+    marginVertical: 20,
   },
 });
 
