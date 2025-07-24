@@ -2,9 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DefectDensityMeter from '../components/DefectDensityMeter';
-import DefectPieCharts from '../components/DefectPieCharts';
 import SeverityIndexIndicator from '../components/SeverityIndexIndicator';
 import DefectRemarkRatioCard from '../components/DefectRemarkRatioCard';
+import DefectsReopenedChart from '../components/DefectsReopenedChart';
+import DefectDistributionChart from '../components/DefectDistributionChart';
 
 interface DefectData {
   total: number;
@@ -52,31 +53,6 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
   // Time metrics (in hours)
   const avgTimeToFind = 24.5;
   const avgTimeToFix = 18.2;
-
-  // Defect distribution by type (mock data)
-  const defectTypes = [
-    {
-      type: 'Functional',
-      count: Math.floor(totalDefects * 0.4),
-      color: '#3b82f6',
-    },
-    { type: 'UI/UX', count: Math.floor(totalDefects * 0.25), color: '#10b981' },
-    {
-      type: 'Performance',
-      count: Math.floor(totalDefects * 0.15),
-      color: '#f59e0b',
-    },
-    {
-      type: 'Security',
-      count: Math.floor(totalDefects * 0.1),
-      color: '#ef4444',
-    },
-    {
-      type: 'Integration',
-      count: Math.floor(totalDefects * 0.1),
-      color: '#8b5cf6',
-    },
-  ];
 
   // Defects by module (mock data)
   const moduleDefects = [
@@ -136,7 +112,13 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
 
       {/* Defects Reopened Multiple Times */}
       <View style={styles.indicatorContainer}>
-        <DefectPieCharts />
+        <View style={styles.containerHeader}>
+          <Ionicons name="refresh-outline" size={24} color="#f59e0b" />
+          <Text style={styles.containerTitle}>
+            Defects Reopened Multiple Times
+          </Text>
+        </View>
+        <DefectsReopenedChart />
       </View>
 
       {/* Defect Distribution by Type */}
@@ -145,22 +127,7 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
           <Ionicons name="pie-chart-outline" size={24} color="#8b5cf6" />
           <Text style={styles.containerTitle}>Defect Distribution by Type</Text>
         </View>
-        <View style={styles.distributionList}>
-          {defectTypes.map((type, index) => (
-            <View key={index} style={styles.distributionItem}>
-              <View style={styles.distributionHeader}>
-                <View
-                  style={[
-                    styles.distributionDot,
-                    { backgroundColor: type.color },
-                  ]}
-                />
-                <Text style={styles.distributionLabel}>{type.type}</Text>
-              </View>
-              <Text style={styles.distributionValue}>{type.count}</Text>
-            </View>
-          ))}
-        </View>
+        <DefectDistributionChart />
       </View>
 
       {/* Time to Find Defects */}
