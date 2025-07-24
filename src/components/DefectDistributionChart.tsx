@@ -1,49 +1,87 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import PieChart from 'react-native-pie-chart';
+import { getDefectBreakdown } from '../data/mockData';
 
-interface PieSlice {
-  value: number;
-  color: string;
-  label?: {
-    text: string;
-    fontSize?: number;
-    offsetX?: number;
-    offsetY?: number;
-    fontWeight?: 'bold' | 'normal';
-    fontStyle?: 'italic' | 'normal';
-    outline?: string;
+interface DefectData {
+  total: number;
+  reopen: number;
+  closed: number;
+  new: number;
+  reject: number;
+  open: number;
+  duplicate: number;
+  fixed: number;
+}
+
+interface DefectDistributionChartProps {
+  defectData: {
+    high: DefectData;
+    medium: DefectData;
+    low: DefectData;
   };
 }
 
-const DefectDistributionChart: React.FC = () => {
+const DefectDistributionChart: React.FC<DefectDistributionChartProps> = ({
+  defectData,
+}) => {
   const widthAndHeight = 220;
 
-  const typeSeries: PieSlice[] = [
-    { value: 245, color: '#4285F4', label: { text: 'Functionality', fontSize: 10 } },
-    { value: 81, color: '#00bfae', label: { text: 'UI', fontSize: 10 } },
-    { value: 30, color: '#fbbc05', label: { text: 'Usability', fontSize: 10 } },
-    { value: 103, color: '#ea4335', label: { text: 'Validation', fontSize: 10 } },
-  ];
+  // Use centralized defect breakdown calculation
+  const breakdown = getDefectBreakdown(defectData);
+
+  const typeSeries = [
+    {
+      value: breakdown.functionality,
+      color: '#4285F4',
+      label: { text: 'Functionality', fontSize: 10 },
+    },
+    {
+      value: breakdown.ui,
+      color: '#00bfae',
+      label: { text: 'UI', fontSize: 10 },
+    },
+    {
+      value: breakdown.usability,
+      color: '#fbbc05',
+      label: { text: 'Usability', fontSize: 10 },
+    },
+    {
+      value: breakdown.validation,
+      color: '#ea4335',
+      label: { text: 'Validation', fontSize: 10 },
+    },
+  ].filter(item => item.value > 0);
 
   return (
     <View style={styles.container}>
       <PieChart widthAndHeight={widthAndHeight} series={typeSeries} />
       <View style={styles.legendContainer}>
-        <Text style={styles.legend}>
-          <Text style={{ color: '#4285F4' }}>⬤</Text> Functionality: 245 (53.4%)
+        {typeSeries.map((item, index) => {
+          const total = typeSeries.reduce((sum, s) => sum + s.value, 0);
+          const percentage =
+            total > 0 ? ((item.value / total) * 100).toFixed(1) : '0.0';
+          return (
+            <Text key={index} style={styles.legend}>
+              <Text style={{ color: item.color }}>⬤</Text> {item.label?.text}:{' '}
+              {item.value} ({percentage}%)
+            </Text>
+          );
+        })}
+        <Text style={[styles.total, { marginTop: 8 }]}>
+          {breakdown.totalDefects} Total Defects
         </Text>
-        <Text style={styles.legend}>
-          <Text style={{ color: '#00bfae' }}>⬤</Text> UI: 81 (17.6%)
-        </Text>
-        <Text style={styles.legend}>
-          <Text style={{ color: '#fbbc05' }}>⬤</Text> Usability: 30 (6.5%)
-        </Text>
-        <Text style={styles.legend}>
-          <Text style={{ color: '#ea4335' }}>⬤</Text> Validation: 103 (22.4%)
-        </Text>
-        <Text style={[styles.total, { marginTop: 8 }]}>459 Total Defects</Text>
-        <Text style={styles.common}>245 Most Common: Functionality</Text>
+        {typeSeries.length > 0 && (
+          <Text style={styles.common}>
+            {Math.max(...typeSeries.map(s => s.value))} Most Common:{' '}
+            {
+              typeSeries.find(
+                s =>
+                  s.value === Math.max(...typeSeries.map(item => item.value)),
+              )?.label?.text
+            }
+          </Text>
+        )}
       </View>
     </View>
   );

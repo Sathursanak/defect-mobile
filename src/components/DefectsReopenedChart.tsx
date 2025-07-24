@@ -1,39 +1,65 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import PieChart from 'react-native-pie-chart';
+import { getDefectBreakdown } from '../data/mockData';
 
-interface PieSlice {
-  value: number;
-  color: string;
-  label?: {
-    text: string;
-    fontSize?: number;
-    offsetX?: number;
-    offsetY?: number;
-    fontWeight?: 'bold' | 'normal';
-    fontStyle?: 'italic' | 'normal';
-    outline?: string;
+interface DefectData {
+  total: number;
+  reopen: number;
+  closed: number;
+  new: number;
+  reject: number;
+  open: number;
+  duplicate: number;
+  fixed: number;
+}
+
+interface DefectsReopenedChartProps {
+  defectData: {
+    high: DefectData;
+    medium: DefectData;
+    low: DefectData;
   };
 }
 
-const DefectsReopenedChart: React.FC = () => {
+const DefectsReopenedChart: React.FC<DefectsReopenedChartProps> = ({
+  defectData,
+}) => {
   const widthAndHeight = 220;
 
-  const reopenedSeries: PieSlice[] = [
-    { value: 5, color: '#4285F4', label: { text: '2 times', fontSize: 12 } },
-    { value: 1, color: '#fbbc05', label: { text: '4 times', fontSize: 12, offsetY: 10 } },
-  ];
+  // Use centralized defect breakdown calculation
+  const breakdown = getDefectBreakdown(defectData);
+  const totalReopened = breakdown.reopened;
+  const totalOther = breakdown.totalDefects - totalReopened;
+
+  const reopenedSeries = [
+    {
+      value: totalReopened,
+      color: '#4285F4',
+      label: { text: 'Reopened', fontSize: 12 },
+    },
+    {
+      value: totalOther,
+      color: '#fbbc05',
+      label: { text: 'Other', fontSize: 12 },
+    },
+  ].filter(item => item.value > 0);
 
   return (
     <View style={styles.container}>
       <PieChart widthAndHeight={widthAndHeight} series={reopenedSeries} />
       <View style={styles.legendContainer}>
-        <Text style={styles.legend}>
-          <Text style={{ color: '#4285F4' }}>⬤</Text> 2 times: 5 (83.3%)
-        </Text>
-        <Text style={styles.legend}>
-          <Text style={{ color: '#fbbc05' }}>⬤</Text> 4 times: 1 (16.7%)
-        </Text>
+        {reopenedSeries.map((item, index) => {
+          const total = reopenedSeries.reduce((sum, s) => sum + s.value, 0);
+          const percentage =
+            total > 0 ? ((item.value / total) * 100).toFixed(1) : '0.0';
+          return (
+            <Text key={index} style={styles.legend}>
+              <Text style={{ color: item.color }}>⬤</Text> {item.label?.text}:{' '}
+              {item.value} ({percentage}%)
+            </Text>
+          );
+        })}
       </View>
     </View>
   );

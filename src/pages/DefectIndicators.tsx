@@ -9,6 +9,7 @@ import DefectDistributionChart from '../components/DefectDistributionChart';
 import TimeToFindChart from '../components/TimeToFindChart';
 import TimeToFixChart from '../components/TimeToFixChart';
 import DefectsByModuleChart from '../components/DefectsByModuleChart';
+import { mockMetrics, calculateTotalDefects } from '../data/mockData';
 
 interface DefectData {
   total: number;
@@ -30,12 +31,11 @@ interface DefectIndicatorsProps {
 }
 
 const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
-  // Calculate overall metrics
-  const totalDefects =
-    defectData.high.total + defectData.medium.total + defectData.low.total;
+  // Calculate overall metrics using centralized function
+  const totalDefects = calculateTotalDefects(defectData);
 
   // Mock data for demonstration - in real app, this would come from props or API
-  const linesOfCode = 15000; // Mock lines of code
+  const linesOfCode = mockMetrics.linesOfCode;
   const defectDensity =
     linesOfCode > 0 ? ((totalDefects / linesOfCode) * 1000).toFixed(2) : '0.00';
 
@@ -51,7 +51,7 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
       : '0.00';
 
   // Mock data for other metrics
-  const totalRemarks = 45; // Mock total remarks
+  const totalRemarks = mockMetrics.totalRemarks;
 
   return (
     <ScrollView style={styles.container}>
@@ -104,7 +104,7 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
             Defects Reopened Multiple Times
           </Text>
         </View>
-        <DefectsReopenedChart />
+        <DefectsReopenedChart defectData={defectData} />
       </View>
 
       {/* Defect Distribution by Type */}
@@ -113,7 +113,7 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
           <Ionicons name="pie-chart-outline" size={24} color="#8b5cf6" />
           <Text style={styles.containerTitle}>Defect Distribution by Type</Text>
         </View>
-        <DefectDistributionChart />
+        <DefectDistributionChart defectData={defectData} />
       </View>
 
       {/* Time to Find Defects */}
@@ -122,7 +122,7 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
           <Ionicons name="time-outline" size={24} color="#3b82f6" />
           <Text style={styles.containerTitle}>Time to Find Defects</Text>
         </View>
-        <TimeToFindChart />
+        <TimeToFindChart defectData={defectData} />
         <Text style={styles.metricDescription}>
           Daily trend of defects discovered over time
         </Text>
@@ -134,7 +134,7 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
           <Ionicons name="build-outline" size={24} color="#10b981" />
           <Text style={styles.containerTitle}>Time to Fix Defects</Text>
         </View>
-        <TimeToFixChart />
+        <TimeToFixChart defectData={defectData} />
         <Text style={styles.metricDescription}>
           Daily trend of defects fixed over time
         </Text>
@@ -146,7 +146,7 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
           <Ionicons name="layers-outline" size={24} color="#f59e0b" />
           <Text style={styles.containerTitle}>Defects by Module</Text>
         </View>
-        <DefectsByModuleChart />
+        <DefectsByModuleChart defectData={defectData} />
         <Text style={styles.metricDescription}>
           Distribution of defects across different modules
         </Text>

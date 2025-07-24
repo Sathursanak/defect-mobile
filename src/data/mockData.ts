@@ -149,3 +149,116 @@ export const markAllNotificationsAsRead = (): void => {
     notification.read = true;
   });
 };
+
+// Chart data interfaces
+export interface ChartDataPoint {
+  x: string;
+  y: number;
+}
+
+export interface PieSlice {
+  value: number;
+  color: string;
+  label?: {
+    text: string;
+    fontSize?: number;
+    offsetX?: number;
+    offsetY?: number;
+    fontWeight?: 'bold' | 'normal';
+    fontStyle?: 'italic' | 'normal';
+    outline?: string;
+  };
+}
+
+// Mock chart data
+export const timeToFindData: ChartDataPoint[] = [
+  { x: 'Day 1', y: 2 },
+  { x: 'Day 2', y: 3 },
+  { x: 'Day 3', y: 1 },
+  { x: 'Day 4', y: 4 },
+  { x: 'Day 5', y: 2 },
+  { x: 'Day 6', y: 3 },
+  { x: 'Day 7', y: 2 },
+  { x: 'Day 8', y: 1 },
+  { x: 'Day 9', y: 2 },
+  { x: 'Day 10', y: 1 },
+];
+
+export const timeToFixData: ChartDataPoint[] = [
+  { x: 'Day 1', y: 3 },
+  { x: 'Day 2', y: 2 },
+  { x: 'Day 3', y: 4 },
+  { x: 'Day 4', y: 3 },
+  { x: 'Day 5', y: 2 },
+  { x: 'Day 6', y: 3 },
+  { x: 'Day 7', y: 2 },
+  { x: 'Day 8', y: 1 },
+  { x: 'Day 9', y: 2 },
+  { x: 'Day 10', y: 2 },
+];
+
+export const defectsByModuleData: PieSlice[] = [
+  { value: 30, color: '#3b82f6', label: { text: 'Auth', fontSize: 10 } },
+  { value: 25, color: '#10b981', label: { text: 'Dashboard', fontSize: 10 } },
+  { value: 20, color: '#f59e0b', label: { text: 'Reports', fontSize: 10 } },
+  { value: 15, color: '#ef4444', label: { text: 'Settings', fontSize: 10 } },
+  { value: 10, color: '#8b5cf6', label: { text: 'API', fontSize: 10 } },
+];
+
+export const defectsReopenedData: PieSlice[] = [
+  { value: 5, color: '#4285F4', label: { text: '2 times', fontSize: 12 } },
+  { value: 1, color: '#fbbc05', label: { text: '4 times', fontSize: 12, offsetY: 10 } },
+];
+
+export const defectDistributionData: PieSlice[] = [
+  { value: 245, color: '#4285F4', label: { text: 'Functionality', fontSize: 10 } },
+  { value: 81, color: '#00bfae', label: { text: 'UI', fontSize: 10 } },
+  { value: 30, color: '#fbbc05', label: { text: 'Usability', fontSize: 10 } },
+  { value: 103, color: '#ea4335', label: { text: 'Validation', fontSize: 10 } },
+];
+
+// Other mock metrics
+export const mockMetrics = {
+  totalRemarks: 45,
+  linesOfCode: 15000,
+  avgTimeToFind: 24.5,
+  avgTimeToFix: 18.2,
+};
+
+// Helper function to calculate total defects consistently
+export const calculateTotalDefects = (defectData: {
+  high: DefectData;
+  medium: DefectData;
+  low: DefectData;
+}): number => {
+  return defectData.high.total + defectData.medium.total + defectData.low.total;
+};
+
+// Helper function to get defect breakdown for charts
+export const getDefectBreakdown = (defectData: {
+  high: DefectData;
+  medium: DefectData;
+  low: DefectData;
+}) => {
+  const totalDefects = calculateTotalDefects(defectData);
+
+  // Calculate proportional distribution based on total defects
+  // Using the severity distribution as the base
+  const highProportion = defectData.high.total / totalDefects;
+  const mediumProportion = defectData.medium.total / totalDefects;
+  const lowProportion = defectData.low.total / totalDefects;
+
+  return {
+    totalDefects,
+    highProportion,
+    mediumProportion,
+    lowProportion,
+    // For charts, we'll use proportional distribution
+    functionality: Math.round(totalDefects * 0.4), // 40% functionality issues
+    ui: Math.round(totalDefects * 0.25), // 25% UI issues
+    usability: Math.round(totalDefects * 0.15), // 15% usability issues
+    validation: Math.round(totalDefects * 0.2), // 20% validation issues
+    reopened: defectData.high.reopen + defectData.medium.reopen + defectData.low.reopen,
+    fixed: defectData.high.fixed + defectData.medium.fixed + defectData.low.fixed,
+  };
+};

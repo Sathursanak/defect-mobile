@@ -1,34 +1,73 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import PieChart from 'react-native-pie-chart';
+import { getDefectBreakdown } from '../data/mockData';
 
-interface PieSlice {
-  value: number;
-  color: string;
-  label?: {
-    text: string;
-    fontSize?: number;
-    offsetX?: number;
-    offsetY?: number;
-    fontWeight?: 'bold' | 'normal';
-    fontStyle?: 'italic' | 'normal';
-    outline?: string;
+interface DefectData {
+  total: number;
+  reopen: number;
+  closed: number;
+  new: number;
+  reject: number;
+  open: number;
+  duplicate: number;
+  fixed: number;
+}
+
+interface DefectsByModuleChartProps {
+  defectData: {
+    high: DefectData;
+    medium: DefectData;
+    low: DefectData;
   };
 }
 
-const DefectsByModuleChart: React.FC = () => {
+const DefectsByModuleChart: React.FC<DefectsByModuleChartProps> = ({
+  defectData,
+}) => {
   const widthAndHeight = 220;
 
-  // Mock data for defects by module
-  const moduleData: PieSlice[] = [
-    { value: 30, color: '#3b82f6', label: { text: 'Auth', fontSize: 10 } },
-    { value: 25, color: '#10b981', label: { text: 'Dashboard', fontSize: 10 } },
-    { value: 20, color: '#f59e0b', label: { text: 'Reports', fontSize: 10 } },
-    { value: 15, color: '#ef4444', label: { text: 'Settings', fontSize: 10 } },
-    { value: 10, color: '#8b5cf6', label: { text: 'API', fontSize: 10 } },
-  ];
+  // Use centralized defect breakdown calculation
+  const breakdown = getDefectBreakdown(defectData);
 
-  const total = moduleData.reduce((sum, item) => sum + item.value, 0);
+  // Calculate module distribution proportionally
+  const authDefects = Math.round(breakdown.totalDefects * 0.3); // 30%
+  const dashboardDefects = Math.round(breakdown.totalDefects * 0.25); // 25%
+  const reportsDefects = Math.round(breakdown.totalDefects * 0.2); // 20%
+  const settingsDefects = Math.round(breakdown.totalDefects * 0.15); // 15%
+  const apiDefects =
+    breakdown.totalDefects -
+    (authDefects + dashboardDefects + reportsDefects + settingsDefects); // Remaining
+
+  const moduleData = [
+    {
+      value: authDefects,
+      color: '#3b82f6',
+      label: { text: 'Auth', fontSize: 10 },
+    },
+    {
+      value: dashboardDefects,
+      color: '#10b981',
+      label: { text: 'Dashboard', fontSize: 10 },
+    },
+    {
+      value: reportsDefects,
+      color: '#f59e0b',
+      label: { text: 'Reports', fontSize: 10 },
+    },
+    {
+      value: settingsDefects,
+      color: '#ef4444',
+      label: { text: 'Settings', fontSize: 10 },
+    },
+    {
+      value: apiDefects,
+      color: '#8b5cf6',
+      label: { text: 'API', fontSize: 10 },
+    },
+  ].filter(item => item.value > 0);
+
+  const total = breakdown.totalDefects;
 
   return (
     <View style={styles.container}>
