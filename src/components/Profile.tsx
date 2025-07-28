@@ -26,7 +26,11 @@ const mockUserData = {
   defectsResolved: 98,
 };
 
-const Profile: React.FC = () => {
+interface ProfileProps {
+  iconColor?: string;
+}
+
+const Profile: React.FC<ProfileProps> = ({ iconColor = '#1a2a5c' }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const navigation = useNavigation();
 
@@ -84,7 +88,7 @@ const Profile: React.FC = () => {
         onPress={handleProfilePress}
         activeOpacity={0.7}
       >
-        <Ionicons name="person-outline" size={24} color="#1a2a5c" />
+        <Ionicons name="person-outline" size={24} color={iconColor} />
       </TouchableOpacity>
 
       <Modal

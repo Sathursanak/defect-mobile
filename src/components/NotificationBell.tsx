@@ -20,7 +20,13 @@ import {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-const NotificationBell: React.FC = () => {
+interface NotificationBellProps {
+  iconColor?: string;
+}
+
+const NotificationBell: React.FC<NotificationBellProps> = ({
+  iconColor = '#1a2a5c',
+}) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
 
@@ -82,7 +88,7 @@ const NotificationBell: React.FC = () => {
         onPress={handleNotificationPress}
         activeOpacity={0.7}
       >
-        <Ionicons name="notifications-outline" size={24} color="#1a2a5c" />
+        <Ionicons name="notifications-outline" size={24} color={iconColor} />
         {unreadCount > 0 && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>
