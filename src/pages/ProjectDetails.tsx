@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
-import Header from '../components/Header';
+import TopHeader from '../components/TopHeader';
+import BackButton from '../components/BackButton';
+import Footer from '../components/Footer';
 import ProjectSelector from '../components/ProjectSelector';
 import SeverityBreakdown from '../components/SeverityBreakdown';
 import DefectIndicators from './DefectIndicators';
@@ -77,58 +79,70 @@ const ProjectDetails = () => {
   const defectData = getDefectData();
 
   return (
-    <ScrollView style={styles.container}>
-      <Header
-        title={`${selectedProject} Details`}
-        onBack={() => navigation.goBack()}
-      />
+    <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+      <TopHeader title={`${selectedProject} Details`} />
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
+      >
 
-      <View style={styles.projectSelectorContainer}>
-        <ProjectSelector
-          projects={allProjects}
-          selectedProject={selectedProject}
-          onProjectSelect={handleProjectSelect}
-        />
-      </View>
-
-      <View style={styles.projectHeader}>
-        <Text style={styles.projectTitle}>{selectedProject}</Text>
-        <View
-          style={[
-            styles.statusBadge,
-            {
-              backgroundColor:
-                currentRisk === 'high'
-                  ? '#c62828'
-                  : currentRisk === 'medium'
-                  ? '#f9a825'
-                  : '#2ecc40',
-            },
-          ]}
-        >
-          <Text style={styles.statusText}>
-            {currentRisk === 'high'
-              ? 'High Risk'
-              : currentRisk === 'medium'
-              ? 'Medium Risk'
-              : 'Low Risk'}
-          </Text>
+        <View style={styles.projectSelectorContainer}>
+          <ProjectSelector
+            projects={allProjects}
+            selectedProject={selectedProject}
+            onProjectSelect={handleProjectSelect}
+          />
         </View>
-      </View>
 
-      <SeverityBreakdown defectData={defectData} />
+        <View style={styles.projectHeader}>
+          <Text style={styles.projectTitle}>{selectedProject}</Text>
+          <View
+            style={[
+              styles.statusBadge,
+              {
+                backgroundColor:
+                  currentRisk === 'high'
+                    ? '#c62828'
+                    : currentRisk === 'medium'
+                    ? '#f9a825'
+                    : '#2ecc40',
+              },
+            ]}
+          >
+            <Text style={styles.statusText}>
+              {currentRisk === 'high'
+                ? 'High Risk'
+                : currentRisk === 'medium'
+                ? 'Medium Risk'
+                : 'Low Risk'}
+            </Text>
+          </View>
+        </View>
 
-      <View style={styles.indicatorsContainer}>
-        <DefectIndicators defectData={defectData} />
-      </View>
-    </ScrollView>
+        <SeverityBreakdown defectData={defectData} />
+
+        <View style={styles.indicatorsContainer}>
+          <DefectIndicators defectData={defectData} />
+        </View>
+      </ScrollView>
+      <Footer />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContent: {
+    paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
+    paddingTop: 80, // Add padding to prevent content from being hidden behind fixed header
+  },
   container: {
     flex: 1,
     backgroundColor: '#f9fafb',
+  },
+  backButtonContainer: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
   },
   projectSelectorContainer: {
     backgroundColor: '#fff',

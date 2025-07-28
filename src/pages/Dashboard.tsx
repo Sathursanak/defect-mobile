@@ -11,7 +11,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import StatusCard from '../components/StatusCard';
 import ProjectCard from '../components/ProjectCard';
-import Header from '../components/Header';
+import TopHeader from '../components/TopHeader';
+import BackButton from '../components/BackButton';
+import Footer from '../components/Footer';
 import { mockProjects } from '../data/mockData';
 
 const PROJECTS: { name: string; risk: RiskLevel }[] = mockProjects.map(
@@ -110,96 +112,99 @@ const Dashboard = () => {
       : PROJECTS.filter(p => p.risk === selectedFilter);
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: '#f9fafb' }}>
-      <Header title="Dashboard Overview" onBack={() => navigation.goBack()}>
-        <Text style={styles.subtitle}>
-          Gain insights into your projects with real-time health metrics and
-          status summaries
-        </Text>
-      </Header>
+    <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+      <TopHeader title="Dashboard Overview" />
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={styles.scrollContent}
+      >
 
-      <View style={styles.statusCardsRow}>
-        {statusCards.map(card => (
-          <StatusCard
-            key={card.key}
-            icon={card.icon}
-            label={card.label}
-            count={card.count}
-            desc={card.desc}
-            color={card.color}
-          />
-        ))}
-      </View>
-
-      <View style={styles.projectsSection}>
-        <View style={styles.filtersRow}>
-          {FILTERS.map(filter => (
-            <TouchableOpacity
-              key={filter.key}
-              style={[
-                styles.filterButton,
-                selectedFilter === filter.key && [
-                  styles.filterButtonActive,
-                  filter.key === 'high' && { borderColor: '#c62828' },
-                  filter.key === 'medium' && { borderColor: '#f9a825' },
-                  filter.key === 'low' && { borderColor: '#2ecc40' },
-                ],
-              ]}
-              onPress={() => setSelectedFilter(filter.key)}
-              activeOpacity={0.8}
-            >
-              <Text
-                style={[
-                  styles.filterButtonText,
-                  selectedFilter === filter.key &&
-                    styles.filterButtonTextActive,
-                  filter.key === 'high' && { color: '#c62828' },
-                  filter.key === 'medium' && { color: '#f9a825' },
-                  filter.key === 'low' && { color: '#2ecc40' },
-                ]}
-              >
-                {filter.label}
-              </Text>
-            </TouchableOpacity>
+        <View style={styles.statusCardsRow}>
+          {statusCards.map(card => (
+            <StatusCard
+              key={card.key}
+              icon={card.icon}
+              label={card.label}
+              count={card.count}
+              desc={card.desc}
+              color={card.color}
+            />
           ))}
         </View>
-        <View style={styles.projectsRow}>
-          {filteredProjects.length === 0 ? (
-            <Text style={styles.noProjectsText}>
-              No projects found for this filter.
-            </Text>
-          ) : (
-            filteredProjects.map((project, idx) => (
-              <ProjectCard
-                key={project.name + idx}
-                name={project.name}
-                risk={project.risk}
-                riskColor={RISK_COLORS[project.risk] || '#1a2a5c'}
-                riskLabel={RISK_LABELS[project.risk]}
-                icon={getProjectIcon(project.risk)}
-                size={PROJECT_CARD_SIZE}
-              />
-            ))
-          )}
+
+        <View style={styles.projectsSection}>
+          <View style={styles.filtersRow}>
+            {FILTERS.map(filter => (
+              <TouchableOpacity
+                key={filter.key}
+                style={[
+                  styles.filterButton,
+                  selectedFilter === filter.key && [
+                    styles.filterButtonActive,
+                    filter.key === 'high' && { borderColor: '#c62828' },
+                    filter.key === 'medium' && { borderColor: '#f9a825' },
+                    filter.key === 'low' && { borderColor: '#2ecc40' },
+                  ],
+                ]}
+                onPress={() => setSelectedFilter(filter.key)}
+                activeOpacity={0.8}
+              >
+                <Text
+                  style={[
+                    styles.filterButtonText,
+                    selectedFilter === filter.key &&
+                      styles.filterButtonTextActive,
+                    filter.key === 'high' && { color: '#c62828' },
+                    filter.key === 'medium' && { color: '#f9a825' },
+                    filter.key === 'low' && { color: '#2ecc40' },
+                  ]}
+                >
+                  {filter.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View style={styles.projectsRow}>
+            {filteredProjects.length === 0 ? (
+              <Text style={styles.noProjectsText}>
+                No projects found for this filter.
+              </Text>
+            ) : (
+              filteredProjects.map((project, idx) => (
+                <ProjectCard
+                  key={project.name + idx}
+                  name={project.name}
+                  risk={project.risk}
+                  riskColor={RISK_COLORS[project.risk] || '#1a2a5c'}
+                  riskLabel={RISK_LABELS[project.risk]}
+                  icon={getProjectIcon(project.risk)}
+                  size={PROJECT_CARD_SIZE}
+                />
+              ))
+            )}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+      <Footer />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  headerWrapper: {
-    paddingTop: 48,
-    paddingHorizontal: 24,
-    backgroundColor: 'fffff',
-    alignItems: 'center',
-    marginBottom: 8,
+  scrollContent: {
+    paddingBottom: 100, // Add padding to prevent content from being hidden behind footer
+    paddingTop: 80, // Add padding to prevent content from being hidden behind fixed header
   },
-  backButton: {
-    position: 'absolute',
-    top: 28,
-    left: 0,
-    zIndex: 2,
+  backButtonContainer: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    backgroundColor: '#fff',
+  },
+  dashboardHeader: {
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    backgroundColor: '#fff',
+    marginBottom: 8,
   },
   title: {
     fontSize: 32,

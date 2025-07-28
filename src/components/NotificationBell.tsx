@@ -23,7 +23,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const NotificationBell: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
-  
+
   const unreadCount = getUnreadNotificationCount();
   const recentNotifications = getRecentNotifications();
 
@@ -123,11 +123,15 @@ const NotificationBell: React.FC = () => {
             <ScrollView style={styles.notificationsList}>
               {recentNotifications.length === 0 ? (
                 <View style={styles.emptyState}>
-                  <Ionicons name="notifications-off" size={48} color="#9ca3af" />
+                  <Ionicons
+                    name="notifications-off"
+                    size={48}
+                    color="#9ca3af"
+                  />
                   <Text style={styles.emptyText}>No notifications</Text>
                 </View>
               ) : (
-                recentNotifications.map((notification) => (
+                recentNotifications.map(notification => (
                   <TouchableOpacity
                     key={notification.id}
                     style={[
@@ -165,7 +169,6 @@ const NotificationBell: React.FC = () => {
 const styles = StyleSheet.create({
   bellContainer: {
     position: 'relative',
-    marginRight: 16,
   },
   badge: {
     position: 'absolute',

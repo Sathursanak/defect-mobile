@@ -1,58 +1,19 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ViewStyle,
-  TouchableOpacity,
-} from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import BackButton from './BackButton';
-import NotificationBell from './NotificationBell';
 
 interface HeaderProps {
   title?: string;
   onBack?: () => void;
   style?: ViewStyle;
   children?: React.ReactNode;
-  showLogout?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({
-  title,
-  onBack,
-  style,
-  children,
-  showLogout = true,
-}) => {
-  const navigation = useNavigation();
-
-  const handleLogout = () => {
-    // Navigate back to Welcome screen (which will reset the navigation stack)
-    (navigation as any).reset({
-      index: 0,
-      routes: [{ name: 'Welcome' }],
-    });
-  };
-
+const Header: React.FC<HeaderProps> = ({ title, onBack, style, children }) => {
   return (
     <View style={[styles.headerWrapper, style]}>
       {onBack && <BackButton onPress={onBack} style={styles.backButton} />}
       {title && <Text style={styles.title}>{title}</Text>}
-      {showLogout && (
-        <View style={styles.rightActions}>
-          <NotificationBell />
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={handleLogout}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="log-out-outline" size={24} color="#1a2a5c" />
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      )}
       {children}
     </View>
   );
@@ -80,24 +41,6 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     textAlign: 'center',
     marginTop: 8,
-  },
-  rightActions: {
-    position: 'absolute',
-    top: 28,
-    right: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    zIndex: 2,
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logoutText: {
-    color: '#1a2a5c',
-    fontSize: 16,
-    marginLeft: 4,
-    fontWeight: 'bold',
   },
 });
 
