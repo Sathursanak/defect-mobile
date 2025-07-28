@@ -44,77 +44,77 @@ const DefectDensityMeter: React.FC<DefectDensityMeterProps> = ({
         maxValue={maxValue}
         labels={[
           {
-            name: 'Low',
+            name: 'Low-1',
             labelColor: '#10b981',
             activeBarColor: '#10b981',
           },
           {
-            name: 'Low',
+            name: 'Low-2',
             labelColor: '#10b981',
             activeBarColor: '#10b981',
           },
           {
-            name: 'Low',
+            name: 'Low-3',
             labelColor: '#10b981',
             activeBarColor: '#10b981',
           },
           {
-            name: 'Low',
+            name: 'Low-4',
             labelColor: '#10b981',
             activeBarColor: '#10b981',
           },
           {
-            name: 'Low',
+            name: 'Low-5',
             labelColor: '#10b981',
             activeBarColor: '#10b981',
           },
           {
-            name: 'Low',
+            name: 'Low-6',
             labelColor: '#10b981',
             activeBarColor: '#10b981',
           },
           {
-            name: 'Low',
+            name: 'Low-7',
             labelColor: '#10b981',
             activeBarColor: '#10b981',
           },
           {
-            name: 'Medium',
+            name: 'Medium-1',
             labelColor: '#f59e0b',
             activeBarColor: '#f59e0b',
           },
           {
-            name: 'Medium',
+            name: 'Medium-2',
             labelColor: '#f59e0b',
             activeBarColor: '#f59e0b',
           },
           {
-            name: 'Medium',
+            name: 'Medium-3',
             labelColor: '#f59e0b',
             activeBarColor: '#f59e0b',
           },
           {
-            name: 'High',
+            name: 'High-1',
             labelColor: '#ef4444',
             activeBarColor: '#ef4444',
           },
           {
-            name: 'High',
+            name: 'High-2',
             labelColor: '#ef4444',
             activeBarColor: '#ef4444',
           },
           {
-            name: 'High',
+            name: 'High-3',
             labelColor: '#ef4444',
             activeBarColor: '#ef4444',
           },
           {
-            name: 'High',
+            name: 'High-4',
             labelColor: '#ef4444',
             activeBarColor: '#ef4444',
           },
           {
-            name: 'High',
+            name: 'High-5',
             labelColor: '#ef4444',
             activeBarColor: '#ef4444',
           },

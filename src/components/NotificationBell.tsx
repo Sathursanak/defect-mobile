@@ -22,10 +22,12 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 interface NotificationBellProps {
   iconColor?: string;
+  onPress?: () => void;
 }
 
 const NotificationBell: React.FC<NotificationBellProps> = ({
   iconColor = '#1a2a5c',
+  onPress,
 }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
