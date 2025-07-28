@@ -26,20 +26,22 @@ const Footer: React.FC<FooterProps> = ({ style }) => {
   return (
     <View style={[styles.footerWrapper, style]}>
       <TouchableOpacity
-        style={styles.footerButton}
+        style={styles.iconButton}
         onPress={handleHomePress}
         activeOpacity={0.7}
       >
         <Ionicons name="home-outline" size={24} color="#1a2a5c" />
-        <Text style={styles.footerButtonText}>Home</Text>
+        <Text style={styles.iconLabel}>Home</Text>
       </TouchableOpacity>
 
-      <View style={styles.rightActions}>
-        <View style={styles.notificationContainer}>
-          <NotificationBell />
-          <Text style={styles.notificationText}>Notifications</Text>
-        </View>
+      <View style={styles.iconButton}>
+        <NotificationBell />
+        <Text style={styles.iconLabel}>Notifications</Text>
+      </View>
+
+      <View style={styles.iconButton}>
         <Profile />
+        <Text style={styles.iconLabel}>Profile</Text>
       </View>
     </View>
   );
@@ -52,11 +54,11 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     backgroundColor: '#fff',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    paddingBottom: 24, // Extra padding for safe area
+    paddingHorizontal: 32,
+    paddingVertical: 20,
+    paddingBottom: 28, // Extra padding for safe area
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: '#e5e7eb',
@@ -70,34 +72,22 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 1000,
   },
-  footerButton: {
-    flexDirection: 'row',
+  iconButton: {
     alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 8,
     paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: 'transparent',
+    minWidth: 70,
+    flex: 1,
   },
-  footerButtonText: {
-    color: '#1a2a5c',
-    fontSize: 16,
-    marginLeft: 8,
-    fontWeight: 'bold',
-  },
-  rightActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  notificationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginRight: 8,
-  },
-  notificationText: {
-    color: '#1a2a5c',
-    fontSize: 16,
-    marginLeft: 8,
-    fontWeight: 'bold',
+  iconLabel: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 4,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });
 

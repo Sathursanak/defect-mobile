@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    textAlign: 'center',
+    // textAlign: 'center',
     flex: 1,
     flexShrink: 1,
   },

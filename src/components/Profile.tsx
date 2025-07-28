@@ -60,7 +60,7 @@ const Profile: React.FC = () => {
           },
         },
       ],
-      { cancelable: true }
+      { cancelable: true },
     );
   };
 
@@ -71,7 +71,10 @@ const Profile: React.FC = () => {
 
   const handleChangePassword = () => {
     // TODO: Navigate to change password screen
-    Alert.alert('Change Password', 'Change password functionality coming soon!');
+    Alert.alert(
+      'Change Password',
+      'Change password functionality coming soon!',
+    );
   };
 
   return (
@@ -82,7 +85,6 @@ const Profile: React.FC = () => {
         activeOpacity={0.7}
       >
         <Ionicons name="person-outline" size={24} color="#1a2a5c" />
-        <Text style={styles.profileText}>Profile</Text>
       </TouchableOpacity>
 
       <Modal
@@ -127,7 +129,9 @@ const Profile: React.FC = () => {
                   <Ionicons name="business-outline" size={20} color="#6b7280" />
                   <View style={styles.detailContent}>
                     <Text style={styles.detailLabel}>Department</Text>
-                    <Text style={styles.detailValue}>{mockUserData.department}</Text>
+                    <Text style={styles.detailValue}>
+                      {mockUserData.department}
+                    </Text>
                   </View>
                 </View>
 
@@ -135,7 +139,9 @@ const Profile: React.FC = () => {
                   <Ionicons name="calendar-outline" size={20} color="#6b7280" />
                   <View style={styles.detailContent}>
                     <Text style={styles.detailLabel}>Joined</Text>
-                    <Text style={styles.detailValue}>{mockUserData.joinDate}</Text>
+                    <Text style={styles.detailValue}>
+                      {mockUserData.joinDate}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -145,15 +151,21 @@ const Profile: React.FC = () => {
                 <Text style={styles.sectionTitle}>Statistics</Text>
                 <View style={styles.statsGrid}>
                   <View style={styles.statItem}>
-                    <Text style={styles.statNumber}>{mockUserData.projectsAssigned}</Text>
+                    <Text style={styles.statNumber}>
+                      {mockUserData.projectsAssigned}
+                    </Text>
                     <Text style={styles.statLabel}>Projects</Text>
                   </View>
                   <View style={styles.statItem}>
-                    <Text style={styles.statNumber}>{mockUserData.defectsReported}</Text>
+                    <Text style={styles.statNumber}>
+                      {mockUserData.defectsReported}
+                    </Text>
                     <Text style={styles.statLabel}>Reported</Text>
                   </View>
                   <View style={styles.statItem}>
-                    <Text style={styles.statNumber}>{mockUserData.defectsResolved}</Text>
+                    <Text style={styles.statNumber}>
+                      {mockUserData.defectsResolved}
+                    </Text>
                     <Text style={styles.statLabel}>Resolved</Text>
                   </View>
                 </View>
@@ -173,7 +185,11 @@ const Profile: React.FC = () => {
                   style={styles.actionButton}
                   onPress={handleChangePassword}
                 >
-                  <Ionicons name="lock-closed-outline" size={20} color="#3b82f6" />
+                  <Ionicons
+                    name="lock-closed-outline"
+                    size={20}
+                    color="#3b82f6"
+                  />
                   <Text style={styles.actionButtonText}>Change Password</Text>
                 </TouchableOpacity>
 
@@ -182,7 +198,9 @@ const Profile: React.FC = () => {
                   onPress={handleLogout}
                 >
                   <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-                  <Text style={[styles.actionButtonText, styles.logoutButtonText]}>
+                  <Text
+                    style={[styles.actionButtonText, styles.logoutButtonText]}
+                  >
                     Logout
                   </Text>
                 </TouchableOpacity>
@@ -197,16 +215,8 @@ const Profile: React.FC = () => {
 
 const styles = StyleSheet.create({
   profileContainer: {
-    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  profileText: {
-    color: '#1a2a5c',
-    fontSize: 16,
-    marginLeft: 8,
-    fontWeight: 'bold',
+    justifyContent: 'center',
   },
   modalOverlay: {
     flex: 1,
