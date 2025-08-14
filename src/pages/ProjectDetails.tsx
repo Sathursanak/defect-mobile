@@ -1,5 +1,13 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import TopHeader from '../components/TopHeader';
 import BackButton from '../components/BackButton';
@@ -7,7 +15,7 @@ import Footer from '../components/Footer';
 import ProjectSelector from '../components/ProjectSelector';
 import SeverityBreakdown from '../components/SeverityBreakdown';
 import DefectIndicators from './DefectIndicators';
-import { mockProjects, getProjectData } from '../data/mockData';
+import { useProjects } from '../hooks/useProjects';
 
 type RootStackParamList = {
   ProjectDetails: {
@@ -22,13 +30,14 @@ const ProjectDetails = () => {
   const navigation = useNavigation();
   const route = useRoute<ProjectDetailsRouteProp>();
   const { projectName: initialProject } = route.params;
+  const { projects, loading, error, refetch, getProjectByName } = useProjects();
 
   const [selectedProject, setSelectedProject] = useState(initialProject);
 
-  const allProjects = mockProjects.map(project => project.name);
+  const allProjects = projects.map(project => project.name);
 
   const getCurrentProjectRisk = () => {
-    const projectData = getProjectData(selectedProject);
+    const projectData = getProjectByName(selectedProject);
     return projectData ? projectData.risk : 'low';
   };
 
@@ -39,7 +48,7 @@ const ProjectDetails = () => {
   };
 
   const getDefectData = () => {
-    const projectData = getProjectData(selectedProject);
+    const projectData = getProjectByName(selectedProject);
     return projectData
       ? projectData.defectData
       : {
@@ -78,6 +87,45 @@ const ProjectDetails = () => {
 
   const defectData = getDefectData();
 
+  // If projects are loaded but the selected project doesn't exist, select the first available project
+  useEffect(() => {
+    if (projects.length > 0 && !getProjectByName(selectedProject)) {
+      setSelectedProject(projects[0].name);
+    }
+  }, [projects, selectedProject, getProjectByName]);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+        <TopHeader title="Project Details" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#1a2a5c" />
+          <Text style={styles.loadingText}>Loading projects...</Text>
+        </View>
+        <Footer />
+      </View>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+        <TopHeader title="Project Details" />
+        <View style={styles.errorContainer}>
+          <Ionicons name="warning-outline" size={48} color="#ef4444" />
+          <Text style={styles.errorText}>Failed to load projects</Text>
+          <Text style={styles.errorSubText}>{error}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={refetch}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+        <Footer />
+      </View>
+    );
+  }
+
   return (
     <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
       <TopHeader title={`${selectedProject} Details`} />
@@ -85,7 +133,6 @@ const ProjectDetails = () => {
         style={styles.container}
         contentContainerStyle={styles.scrollContent}
       >
-
         <View style={styles.projectSelectorContainer}>
           <ProjectSelector
             projects={allProjects}
@@ -260,6 +307,50 @@ const styles = StyleSheet.create({
   },
   indicatorsContainer: {
     marginBottom: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#6b7280',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ef4444',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  errorSubText: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 8,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  retryButton: {
+    backgroundColor: '#1a2a5c',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 24,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

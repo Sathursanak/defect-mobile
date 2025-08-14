@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
@@ -14,14 +15,9 @@ import ProjectCard from '../components/ProjectCard';
 import TopHeader from '../components/TopHeader';
 import BackButton from '../components/BackButton';
 import Footer from '../components/Footer';
-import { mockProjects } from '../data/mockData';
+import { useProjects } from '../hooks/useProjects';
 
-const PROJECTS: { name: string; risk: RiskLevel }[] = mockProjects.map(
-  project => ({
-    name: project.name,
-    risk: project.risk,
-  }),
-);
+// Projects will be fetched from API via useProjects hook
 
 const RISK_COLORS = {
   high: '#c62828',
@@ -65,12 +61,13 @@ const getProjectIcon = (risk: RiskLevel) => {
 const Dashboard = () => {
   const navigation = useNavigation();
   const [selectedFilter, setSelectedFilter] = useState('all');
+  const { projects, loading, error, refetch } = useProjects();
 
   // Calculate dynamic counts for each risk level
   const projectCounts = {
-    high: PROJECTS.filter(p => p.risk === 'high').length,
-    medium: PROJECTS.filter(p => p.risk === 'medium').length,
-    low: PROJECTS.filter(p => p.risk === 'low').length,
+    high: projects.filter(p => p.risk === 'high').length,
+    medium: projects.filter(p => p.risk === 'medium').length,
+    low: projects.filter(p => p.risk === 'low').length,
   };
 
   // Create status cards with dynamic counts
@@ -105,11 +102,48 @@ const Dashboard = () => {
 
   const filteredProjects =
     selectedFilter === 'all'
-      ? PROJECTS.sort((a, b) => {
+      ? projects.sort((a, b) => {
           const riskOrder = { high: 0, medium: 1, low: 2 };
           return riskOrder[a.risk] - riskOrder[b.risk];
         })
-      : PROJECTS.filter(p => p.risk === selectedFilter);
+      : projects.filter(p => p.risk === selectedFilter);
+
+  // Show loading state
+  if (loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+        <TopHeader title="Dashboard Overview" />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#1a2a5c" />
+          <Text style={styles.loadingText}>Loading projects...</Text>
+          <Text style={styles.debugText}>Check console for API logs</Text>
+        </View>
+        <Footer />
+      </View>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
+        <TopHeader title="Dashboard Overview" />
+        <View style={styles.errorContainer}>
+          <Ionicons name="warning-outline" size={48} color="#ef4444" />
+          <Text style={styles.errorText}>Failed to load projects</Text>
+          <Text style={styles.errorSubText}>{error}</Text>
+          <Text style={styles.debugText}>
+            API URL: http://localhost:3000/api/projects{'\n'}
+            Check if server is running and accessible
+          </Text>
+          <TouchableOpacity style={styles.retryButton} onPress={refetch}>
+            <Text style={styles.retryButtonText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+        <Footer />
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: '#f9fafb' }}>
@@ -118,7 +152,6 @@ const Dashboard = () => {
         style={{ flex: 1 }}
         contentContainerStyle={styles.scrollContent}
       >
-
         <View style={styles.statusCardsRow}>
           {statusCards.map(card => (
             <StatusCard
@@ -369,6 +402,57 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 1,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#6b7280',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  errorText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#ef4444',
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  errorSubText: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 8,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  retryButton: {
+    backgroundColor: '#1a2a5c',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 24,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  debugText: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 8,
+    textAlign: 'center',
+    fontFamily: 'monospace',
   },
 });
 

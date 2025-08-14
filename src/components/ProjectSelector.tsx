@@ -1,5 +1,11 @@
 import React, { useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 interface ProjectSelectorProps {
@@ -8,10 +14,10 @@ interface ProjectSelectorProps {
   onProjectSelect: (project: string) => void;
 }
 
-const ProjectSelector: React.FC<ProjectSelectorProps> = ({ 
-  projects, 
-  selectedProject, 
-  onProjectSelect 
+const ProjectSelector: React.FC<ProjectSelectorProps> = ({
+  projects,
+  selectedProject,
+  onProjectSelect,
 }) => {
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -28,26 +34,28 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
       <TouchableOpacity style={styles.scrollIndicator} onPress={scrollLeft}>
         <Ionicons name="chevron-back" size={16} color="#6b7280" />
       </TouchableOpacity>
-      <ScrollView 
+      <ScrollView
         ref={scrollViewRef}
-        horizontal 
-        showsHorizontalScrollIndicator={false} 
+        horizontal
+        showsHorizontalScrollIndicator={false}
         style={styles.projectSelector}
         contentContainerStyle={styles.projectSelectorContent}
       >
-        {projects.map((project) => (
+        {projects.map(project => (
           <TouchableOpacity
             key={project}
             style={[
-              styles.projectTab, 
-              project === selectedProject && styles.activeProjectTab
+              styles.projectTab,
+              project === selectedProject && styles.activeProjectTab,
             ]}
             onPress={() => onProjectSelect(project)}
           >
-            <Text style={[
-              styles.projectTabText, 
-              project === selectedProject && styles.activeProjectTabText
-            ]}>
+            <Text
+              style={[
+                styles.projectTabText,
+                project === selectedProject && styles.activeProjectTabText,
+              ]}
+            >
               {project}
             </Text>
           </TouchableOpacity>
@@ -102,6 +110,3 @@ const styles = StyleSheet.create({
 });
 
 export default ProjectSelector;
-
-
-
