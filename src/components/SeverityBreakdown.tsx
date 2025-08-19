@@ -346,7 +346,6 @@ const styles = StyleSheet.create({
   },
   pieChartContainer: {
     alignItems: 'center',
-    
   },
   pieChart: {
     width: 200,

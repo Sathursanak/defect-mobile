@@ -42,7 +42,13 @@ const TopHeader: React.FC<TopHeaderProps> = ({
               <Ionicons name="bug-outline" size={28} color="#ffffff" />
             </View>
             {title && (
-              <Text style={[styles.title, { color: titleColor }]}>{title}</Text>
+              <Text
+                style={[styles.title, { color: titleColor }]}
+                numberOfLines={2}
+                ellipsizeMode="tail"
+              >
+                {title}
+              </Text>
             )}
           </View>
         </View>
@@ -81,6 +87,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 8,
+    flex: 1,
+    maxWidth: '100%',
   },
   appIconContainer: {
     marginRight: 12,
@@ -92,9 +100,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    // textAlign: 'center',
+    textAlign: 'center',
     flex: 1,
     flexShrink: 1,
+    lineHeight: 22,
   },
 });
 

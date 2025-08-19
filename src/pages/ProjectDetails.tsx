@@ -142,7 +142,13 @@ const ProjectDetails = () => {
         </View>
 
         <View style={styles.projectHeader}>
-          <Text style={styles.projectTitle}>{selectedProject}</Text>
+          <Text
+            style={styles.projectTitle}
+            numberOfLines={3}
+            ellipsizeMode="tail"
+          >
+            {selectedProject}
+          </Text>
           <View
             style={[
               styles.statusBadge,
@@ -223,7 +229,7 @@ const styles = StyleSheet.create({
   projectHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: 24,
     marginBottom: 24,
   },
@@ -231,11 +237,16 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     color: '#1a2a5c',
+    flex: 1,
+    marginRight: 12,
+    lineHeight: 32,
   },
   statusBadge: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
+    alignSelf: 'flex-start',
+    flexShrink: 0,
   },
   statusText: {
     color: '#fff',

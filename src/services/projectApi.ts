@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import { ApiProject, ProjectsApiResponse, ProjectData, DefectData } from '../types/api';
 
 
-const API_BASE_URL = 'http://192.168.1.26:3000/api'; // Your computer's IP address
+const API_BASE_URL = 'http://192.168.1.192:3000/api'; // Your computer's IP address
 
 // Create axios instance with default configuration
 const apiClient = axios.create({
