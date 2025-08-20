@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Modal,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import PieChart from 'react-native-pie-chart';
@@ -22,11 +23,7 @@ interface DefectData {
 }
 
 interface SeverityBreakdownProps {
-  defectData: {
-    high: DefectData;
-    medium: DefectData;
-    low: DefectData;
-  };
+  defectData: Record<string, DefectData>;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -42,11 +39,9 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
   defectData,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedSeverity, setSelectedSeverity] = useState<
-    'high' | 'medium' | 'low'
-  >('high');
+  const [selectedSeverity, setSelectedSeverity] = useState<string>('high');
 
-  const handleViewChart = (severity: 'high' | 'medium' | 'low') => {
+  const handleViewChart = (severity: string) => {
     setSelectedSeverity(severity);
     setModalVisible(true);
   };
@@ -111,99 +106,104 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
     );
   };
 
-  const severityConfig = [
-    { key: 'high', title: 'High Severity', color: '#c62828' },
-    { key: 'medium', title: 'Medium Severity', color: '#f9a825' },
-    { key: 'low', title: 'Low Severity', color: '#2ecc40' },
-  ];
+  // Map severity keys to display names and colors
+  // Add or edit severities here as needed
+  const severityMeta: Record<string, { title: string; color: string }> = {
+    critical: { title: 'Critical', color: '#b71c1c' },
+    blocker: { title: 'Blocker', color: '#880e4f' },
+    high: { title: 'High', color: '#c62828' },
+    medium: { title: 'Medium', color: '#f9a825' },
+    low: { title: 'Low', color: '#2ecc40' },
+    minor: { title: 'Minor', color: '#039be5' },
+    
+  };
+
+  // Dynamically get all severities from defectData
+  const severities = Object.keys(defectData);
 
   return (
     <View>
       <Text style={styles.sectionTitle}>Defect Severity Breakdown</Text>
 
-      <View style={styles.defectCardsContainer}>
-        {severityConfig.map(({ key, title, color }) => {
-          const data = defectData[key as keyof typeof defectData];
+      <ScrollView
+        style={{}}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.defectCardsScrollContainer}
+      >
+        {severities.map(key => {
+          const data = defectData[key];
+          const meta = severityMeta[key] ||
+            severityMeta.default || { title: key, color: '#888' };
           return (
             <View
               key={key}
-              style={[styles.defectCard, { borderTopColor: color }]}
+              style={[styles.defectCard, { borderTopColor: meta.color }]}
             >
               <View style={styles.cardHeader}>
                 <Text
-                  style={[styles.defectCardTitle, { color }]}
+                  style={[styles.defectCardTitle, { color: meta.color }]}
                   numberOfLines={2}
                   ellipsizeMode="tail"
                 >
-                  {title}
+                  {meta.title}
                 </Text>
                 <Text style={styles.defectTotal}>{data.total}</Text>
               </View>
 
               <View style={styles.defectStatsGrid}>
-                <View style={styles.statItem}>
-                  <View style={[styles.dot, { backgroundColor: '#c62828' }]} />
-                  <Text
-                    style={styles.statText}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    REOPEN
-                  </Text>
-                  <Text style={styles.statValue}>{data.reopen}</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <View style={[styles.dot, { backgroundColor: '#2ecc40' }]} />
-                  <Text
-                    style={styles.statText}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    CLOSED
-                  </Text>
-                  <Text style={styles.statValue}>{data.closed}</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <View style={[styles.dot, { backgroundColor: '#f9a825' }]} />
-                  <Text
-                    style={styles.statText}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    NEW
-                  </Text>
-                  <Text style={styles.statValue}>{data.new}</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <View style={[styles.dot, { backgroundColor: '#3b82f6' }]} />
-                  <Text
-                    style={styles.statText}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    FIXED
-                  </Text>
-                  <Text style={styles.statValue}>{data.fixed}</Text>
-                </View>
+                {/* Render all statuses dynamically */}
+                {Object.entries(data).map(([status, value]) => {
+                  if (status === 'total') return null;
+                  // Assign a color for each status (customize as needed)
+                  const statusColors: Record<string, string> = {
+                    reopen: '#c62828',
+                    closed: '#2ecc40',
+                    new: '#f9a825',
+                    fixed: '#3b82f6',
+                    open: '#eab308',
+                    reject: '#7f1d1d',
+                    duplicate: '#6b7280',
+                  };
+                  return (
+                    <View style={styles.statItem} key={status}>
+                      <View
+                        style={[
+                          styles.dot,
+                          { backgroundColor: statusColors[status] || '#bbb' },
+                        ]}
+                      />
+                      <Text
+                        style={styles.statText}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {status.toUpperCase()}
+                      </Text>
+                      <Text style={styles.statValue}>{value}</Text>
+                    </View>
+                  );
+                })}
               </View>
 
               <TouchableOpacity
                 style={[
                   styles.viewChartButton,
-                  { backgroundColor: color + '20', borderColor: color },
+                  {
+                    backgroundColor: meta.color + '20',
+                    borderColor: meta.color,
+                  },
                 ]}
-                onPress={() =>
-                  handleViewChart(key as 'high' | 'medium' | 'low')
-                }
+                onPress={() => handleViewChart(key)}
               >
-                <Text style={[styles.viewChartText, { color }]}>
+                <Text style={[styles.viewChartText, { color: meta.color }]}>
                   View Chart
                 </Text>
               </TouchableOpacity>
             </View>
           );
         })}
-      </View>
+      </ScrollView>
 
       <Modal
         animationType="slide"
@@ -215,8 +215,8 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {severityConfig.find(s => s.key === selectedSeverity)?.title}{' '}
-                Chart
+                {(severityMeta[selectedSeverity]?.title || selectedSeverity) +
+                  ' Chart'}
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#6b7280" />
@@ -238,11 +238,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 16,
   },
-  defectCardsContainer: {
+  defectCardsScrollContainer: {
     flexDirection: 'row',
     paddingHorizontal: 12,
     gap: 8,
-    justifyContent: 'space-between',
+    alignItems: 'stretch',
+    paddingBottom: 8,
   },
   defectCard: {
     flex: 1,

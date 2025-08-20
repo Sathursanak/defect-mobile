@@ -112,22 +112,22 @@ export const projectApi = {
   // Test API connectivity
   async testConnection(): Promise<boolean> {
     try {
-      console.log('🔍 Testing API connection to:', API_BASE_URL);
+      console.log(' Testing API connection to:', API_BASE_URL);
       await apiClient.get('/projects');
-      console.log('✅ API connection test successful');
+      console.log(' API connection test successful');
       return true;
     } catch (error: any) {
-      console.error('❌ API connection test failed:', error.message);
+      console.error(' API connection test failed:', error.message);
       return false;
     }
   },
   // Get all projects
   async getProjects(): Promise<ProjectData[]> {
     try {
-      console.log('🚀 Making API request to:', `${API_BASE_URL}/projects`);
+      console.log(' Making API request to:', `${API_BASE_URL}/projects`);
       const response: AxiosResponse<ProjectsApiResponse> = await apiClient.get('/projects');
 
-      console.log('📡 API Response received:', {
+      console.log(' API Response received:', {
         status: response.status,
         statusText: response.statusText,
         dataType: typeof response.data,
@@ -141,31 +141,31 @@ export const projectApi = {
         // Transform API response to app format
         const projects = response.data.map(transformApiProjectToProjectData);
 
-        console.log('✅ Successfully fetched and transformed projects:', projects.length);
-        console.log('📋 Project names:', projects.map(p => p.name));
+        console.log(' Successfully fetched and transformed projects:', projects.length);
+        console.log('Project names:', projects.map(p => p.name));
         return projects;
       } else {
-        console.error('❌ API returned unexpected response format:', response.data);
-        console.log('🔄 Falling back to mock data');
+        console.error('API returned unexpected response format:', response.data);
+        console.log('Falling back to mock data');
         return getFallbackProjects();
       }
     } catch (error: any) {
-      console.error('💥 Failed to fetch projects:', error);
+      console.error('Failed to fetch projects:', error);
 
       // Log more details about the error
       if (error.response) {
-        console.error('📊 Error response:', {
+        console.error('Error response:', {
           status: error.response.status,
           statusText: error.response.statusText,
           data: error.response.data
         });
       } else if (error.request) {
-        console.error('📡 No response received:', error.request);
+        console.error(' No response received:', error.request);
       } else {
-        console.error('⚙️ Error setting up request:', error.message);
+        console.error(' Error setting up request:', error.message);
       }
 
-      console.log('🔄 Falling back to mock data');
+      console.log(' Falling back to mock data');
       // Return fallback data in case of error
       return getFallbackProjects();
     }

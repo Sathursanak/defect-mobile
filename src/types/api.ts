@@ -40,10 +40,6 @@ export type ProjectsApiResponse = ApiProject[];
 // Transformed project data for the app
 export interface ProjectData {
   name: string;
-  risk: 'high' | 'medium' | 'low';
-  defectData: {
-    high: DefectData;
-    medium: DefectData;
-    low: DefectData;
-  };
+  risk: string;
+  defectData: Record<string, DefectData>;
 }

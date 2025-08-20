@@ -16,6 +16,7 @@ import ProjectSelector from '../components/ProjectSelector';
 import SeverityBreakdown from '../components/SeverityBreakdown';
 import DefectIndicators from './DefectIndicators';
 import { useProjects } from '../hooks/useProjects';
+import { mockDefectData } from '../data/mockData';
 
 type RootStackParamList = {
   ProjectDetails: {
@@ -34,7 +35,17 @@ const ProjectDetails = () => {
 
   const [selectedProject, setSelectedProject] = useState(initialProject);
 
-  const allProjects = projects.map(project => project.name);
+  // Reorder projects to show selected project first
+  const allProjects = React.useMemo(() => {
+    const projectNames = projects.map(project => project.name);
+    if (!selectedProject || !projectNames.includes(selectedProject)) {
+      return projectNames;
+    }
+
+    // Move selected project to first position
+    const otherProjects = projectNames.filter(name => name !== selectedProject);
+    return [selectedProject, ...otherProjects];
+  }, [projects, selectedProject]);
 
   const getCurrentProjectRisk = () => {
     const projectData = getProjectByName(selectedProject);
@@ -172,7 +183,7 @@ const ProjectDetails = () => {
           </View>
         </View>
 
-        <SeverityBreakdown defectData={defectData} />
+        <SeverityBreakdown defectData={mockDefectData} />
 
         <View style={styles.indicatorsContainer}>
           <DefectIndicators defectData={defectData} />

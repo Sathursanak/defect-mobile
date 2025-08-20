@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,15 @@ const ProjectSelector: React.FC<ProjectSelectorProps> = ({
   onProjectSelect,
 }) => {
   const scrollViewRef = useRef<ScrollView>(null);
+
+  // Auto-scroll to beginning to show the selected project (which should be first)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      scrollViewRef.current?.scrollTo({ x: 0, animated: true });
+    }, 100); // Small delay to ensure the component is fully rendered
+
+    return () => clearTimeout(timer);
+  }, [selectedProject]);
 
   const scrollLeft = () => {
     scrollViewRef.current?.scrollTo({ x: -100, animated: true });

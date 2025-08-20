@@ -211,3 +211,68 @@ export const getDefectBreakdown = (defectData: {
     fixed: defectData.high.fixed + defectData.medium.fixed + defectData.low.fixed,
   };
 };
+
+// Example mock defect data for all severities (for demo/testing horizontal scroll)
+export const mockDefectData: Record<string, DefectData> = {
+  critical: {
+    total: 8,
+    reopen: 1,
+    closed: 2,
+    new: 2,
+    reject: 1,
+    open: 1,
+    duplicate: 0,
+    fixed: 1,
+  },
+  blocker: {
+    total: 6,
+    reopen: 0,
+    closed: 2,
+    new: 1,
+    reject: 1,
+    open: 1,
+    duplicate: 0,
+    fixed: 1,
+  },
+  high: {
+    total: 12,
+    reopen: 2,
+    closed: 4,
+    new: 3,
+    reject: 1,
+    open: 1,
+    duplicate: 0,
+    fixed: 1,
+  },
+  medium: {
+    total: 8,
+    reopen: 1,
+    closed: 3,
+    new: 2,
+    reject: 0,
+    open: 1,
+    duplicate: 1,
+    fixed: 0,
+  },
+  low: {
+    total: 5,
+    reopen: 0,
+    closed: 2,
+    new: 1,
+    reject: 1,
+    open: 1,
+    duplicate: 0,
+    fixed: 0,
+  },
+  minor: {
+    total: 3,
+    reopen: 0,
+    closed: 1,
+    new: 1,
+    reject: 0,
+    open: 1,
+    duplicate: 0,
+    fixed: 0,
+  },
+  
+};
