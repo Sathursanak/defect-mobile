@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { MaterialIcons } from '@expo/vector-icons';
 import PieChart from 'react-native-pie-chart';
 
 interface DefectData {
@@ -30,9 +31,10 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 // Calculate responsive card width based on screen size
 const getCardWidth = () => {
+  // Make a bit more than 2 cards visible at once (e.g., 2.3 cards)
   const availableWidth = SCREEN_WIDTH - 48; // Account for padding and gaps
-  const cardWidth = availableWidth / 3;
-  return Math.max(cardWidth, 100); // Minimum width of 100
+  const cardWidth = availableWidth / 2.3;
+  return Math.max(cardWidth, 120); // Minimum width of 120
 };
 
 const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
@@ -40,6 +42,28 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedSeverity, setSelectedSeverity] = useState<string>('high');
+  const scrollRef = useRef<ScrollView>(null);
+  const [scrollX, setScrollX] = useState(0);
+
+  // Scroll amount per click (in px)
+  const SCROLL_AMOUNT = getCardWidth() + 8; // card width + gap
+
+  const handleScrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        x: Math.max(0, scrollX - SCROLL_AMOUNT),
+        animated: true,
+      });
+    }
+  };
+  const handleScrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTo({
+        x: scrollX + SCROLL_AMOUNT,
+        animated: true,
+      });
+    }
+  };
 
   const handleViewChart = (severity: string) => {
     setSelectedSeverity(severity);
@@ -110,12 +134,11 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
   // Add or edit severities here as needed
   const severityMeta: Record<string, { title: string; color: string }> = {
     critical: { title: 'Critical', color: '#b71c1c' },
-    blocker: { title: 'Blocker', color: '#880e4f' },
+    blocker: { title: 'Blocker', color: '#88470eff' },
     high: { title: 'High', color: '#c62828' },
     medium: { title: 'Medium', color: '#f9a825' },
     low: { title: 'Low', color: '#2ecc40' },
     minor: { title: 'Minor', color: '#039be5' },
-    
   };
 
   // Dynamically get all severities from defectData
@@ -124,86 +147,113 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
   return (
     <View>
       <Text style={styles.sectionTitle}>Defect Severity Breakdown</Text>
-
-      <ScrollView
-        style={{}}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.defectCardsScrollContainer}
+      <View
+        style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 4 }}
       >
-        {severities.map(key => {
-          const data = defectData[key];
-          const meta = severityMeta[key] ||
-            severityMeta.default || { title: key, color: '#888' };
-          return (
-            <View
-              key={key}
-              style={[styles.defectCard, { borderTopColor: meta.color }]}
-            >
-              <View style={styles.cardHeader}>
-                <Text
-                  style={[styles.defectCardTitle, { color: meta.color }]}
-                  numberOfLines={2}
-                  ellipsizeMode="tail"
-                >
-                  {meta.title}
-                </Text>
-                <Text style={styles.defectTotal}>{data.total}</Text>
-              </View>
-
-              <View style={styles.defectStatsGrid}>
-                {/* Render all statuses dynamically */}
-                {Object.entries(data).map(([status, value]) => {
-                  if (status === 'total') return null;
-                  // Assign a color for each status (customize as needed)
-                  const statusColors: Record<string, string> = {
-                    reopen: '#c62828',
-                    closed: '#2ecc40',
-                    new: '#f9a825',
-                    fixed: '#3b82f6',
-                    open: '#eab308',
-                    reject: '#7f1d1d',
-                    duplicate: '#6b7280',
-                  };
-                  return (
-                    <View style={styles.statItem} key={status}>
-                      <View
-                        style={[
-                          styles.dot,
-                          { backgroundColor: statusColors[status] || '#bbb' },
-                        ]}
-                      />
-                      <Text
-                        style={styles.statText}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {status.toUpperCase()}
-                      </Text>
-                      <Text style={styles.statValue}>{value}</Text>
-                    </View>
-                  );
-                })}
-              </View>
-
-              <TouchableOpacity
+        {/* Left chevron */}
+        <TouchableOpacity onPress={handleScrollLeft}>
+          <Ionicons
+            name="chevron-back"
+            size={28}
+            color="#bbb"
+            style={{ marginHorizontal: 2 }}
+          />
+        </TouchableOpacity>
+        <ScrollView
+          ref={scrollRef}
+          style={{ flex: 1 }}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.defectCardsScrollContainer}
+          onScroll={e => setScrollX(e.nativeEvent.contentOffset.x)}
+          scrollEventThrottle={16}
+        >
+          {severities.map(key => {
+            const data = defectData[key];
+            const meta = severityMeta[key] ||
+              severityMeta.default || { title: key, color: '#888' };
+            return (
+              <View
+                key={key}
                 style={[
-                  styles.viewChartButton,
-                  {
-                    backgroundColor: meta.color + '20',
-                    borderColor: meta.color,
-                  },
+                  styles.defectCard,
+                  { borderTopColor: meta.color, width: getCardWidth() },
                 ]}
-                onPress={() => handleViewChart(key)}
               >
-                <Text style={[styles.viewChartText, { color: meta.color }]}>
-                  View Chart
-                </Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-      </ScrollView>
+                <View style={styles.cardHeader}>
+                  <Text
+                    style={[styles.defectCardTitle, { color: meta.color }]}
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                  >
+                    {meta.title}
+                  </Text>
+                  <Text style={styles.defectTotal}>{data.total}</Text>
+                </View>
+
+                <View style={styles.defectStatsGrid}>
+                  {/* Render all statuses dynamically */}
+                  {Object.entries(data).map(([status, value]) => {
+                    if (status === 'total') return null;
+                    // Assign a color for each status (customize as needed)
+                    const statusColors: Record<string, string> = {
+                      reopen: '#c62828',
+                      closed: '#2ecc40',
+                      new: '#f9a825',
+                      fixed: '#3b82f6',
+                      open: '#eab308',
+                      reject: '#7f1d1d',
+                      duplicate: '#6b7280',
+                    };
+                    return (
+                      <View style={styles.statItem} key={status}>
+                        <View
+                          style={[
+                            styles.dot,
+                            { backgroundColor: statusColors[status] || '#bbb' },
+                          ]}
+                        />
+                        <Text
+                          style={styles.statText}
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                        >
+                          {status.toUpperCase()}
+                        </Text>
+                        <Text style={styles.statValue}>{value}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+
+                <TouchableOpacity
+                  style={[
+                    styles.viewChartButton,
+                    {
+                      backgroundColor: meta.color + '20',
+                      borderColor: meta.color,
+                    },
+                  ]}
+                  onPress={() => handleViewChart(key)}
+                >
+                  <Text style={[styles.viewChartText, { color: meta.color }]}>
+                    View Chart
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            );
+          })}
+        </ScrollView>
+        {/* Right chevron */}
+        <TouchableOpacity onPress={handleScrollRight}>
+          <Ionicons
+            name="chevron-forward"
+            size={28}
+            color="#bbb"
+            style={{ marginHorizontal: 2 }}
+          />
+        </TouchableOpacity>
+      </View>
 
       <Modal
         animationType="slide"
@@ -246,7 +296,6 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   defectCard: {
-    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 12,
@@ -256,7 +305,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
     minHeight: 160,
-    maxWidth: getCardWidth(),
+    marginRight: 8,
   },
   cardHeader: {
     alignItems: 'center',
