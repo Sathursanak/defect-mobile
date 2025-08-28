@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import DefectDensityMeter from '../components/DefectDensityMeter';
@@ -9,7 +9,8 @@ import DefectDistributionChart from '../components/DefectDistributionChart';
 import TimeToFindChart from '../components/TimeToFindChart';
 import TimeToFixChart from '../components/TimeToFixChart';
 import DefectsByModuleChart from '../components/DefectsByModuleChart';
-import { mockMetrics, calculateTotalDefects } from '../data/mockData';
+import { calculateTotalDefects } from '../data/mockData';
+import { getDefectDensity } from '../services/defectdensity';
 
 interface DefectData {
   total: number;
@@ -28,30 +29,58 @@ interface DefectIndicatorsProps {
     medium: DefectData;
     low: DefectData;
   };
+  projectId?: number;
 }
 
-const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
+const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, projectId }) => {
+  const [densityValue, setDensityValue] = useState<number>(0);
+  const [densityLoading, setDensityLoading] = useState<boolean>(false);
+  const [densityError, setDensityError] = useState<string | null>(null);
+  const [densityColor, setDensityColor] = useState<string | undefined>(undefined);
+  const [densityLevel, setDensityLevel] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchDensity = async () => {
+      if (!projectId) {
+        setDensityValue(0);
+        return;
+      }
+      try {
+        setDensityLoading(true);
+        setDensityError(null);
+        const data = await getDefectDensity(projectId);
+        const item = Array.isArray(data) ? data[0] : data;
+        const value = typeof item?.defect_density === 'number' ? item.defect_density : 0;
+        setDensityValue(value);
+        setDensityColor(typeof item?.density_color === 'string' ? item.density_color : undefined);
+        setDensityLevel(typeof item?.density_level === 'string' ? item.density_level : undefined);
+      } catch (e) {
+        setDensityError('Failed to load defect density');
+        setDensityValue(0);
+      } finally {
+        setDensityLoading(false);
+      }
+    };
+    fetchDensity();
+  }, [projectId]);
   // Calculate overall metrics using centralized function
   const totalDefects = calculateTotalDefects(defectData);
 
-  // Mock data for demonstration - in real app, this would come from props or API
-  const linesOfCode = mockMetrics.linesOfCode;
-  const defectDensity =
-    linesOfCode > 0 ? ((totalDefects / linesOfCode) * 1000).toFixed(2) : '0.00';
+  const defectDensity = densityValue.toFixed(2);
 
   // Defect Severity Index (weighted average: High=3, Medium=2, Low=1)
   const severityIndex =
     totalDefects > 0
       ? (
-          (defectData.high.total * 3 +
-            defectData.medium.total * 2 +
-            defectData.low.total * 1) /
-          totalDefects
-        ).toFixed(2)
+        (defectData.high.total * 3 +
+          defectData.medium.total * 2 +
+          defectData.low.total * 1) /
+        totalDefects
+      ).toFixed(2)
       : '0.00';
 
-  // Mock data for other metrics
-  const totalRemarks = mockMetrics.totalRemarks;
+  // Placeholder until remarks API is integrated
+  const totalRemarks = 0;
 
   return (
     <ScrollView style={styles.container}>
@@ -63,11 +92,21 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData }) => {
           <Ionicons name="speedometer-outline" size={24} color="#06b6d4" />
           <Text style={styles.containerTitle}>Defect Density</Text>
         </View>
-        <DefectDensityMeter
-          value={parseFloat(defectDensity)}
-          size={180}
-          title=""
-        />
+        {densityLoading ? (
+          <Text style={styles.metricDescription}>Loading...</Text>
+        ) : densityError ? (
+          <Text style={[styles.metricDescription, { color: '#ef4444' }]}>{densityError}</Text>
+        ) : densityColor && densityLevel ? (
+          <DefectDensityMeter
+            value={parseFloat(defectDensity)}
+            size={180}
+            title=""
+            color={densityColor}
+            level={densityLevel}
+          />
+        ) : (
+          <Text style={styles.metricDescription}>Loading...</Text>
+        )}
       </View>
 
       {/* Defect Severity Index */}

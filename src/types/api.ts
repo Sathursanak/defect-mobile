@@ -39,6 +39,7 @@ export type ProjectsApiResponse = ApiProject[];
 
 // Transformed project data for the app
 export interface ProjectData {
+  id: number;
   name: string;
   risk: string;
   defectData: Record<string, DefectData>;

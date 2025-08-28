@@ -7,32 +7,22 @@ interface DefectDensityMeterProps {
   size?: number;
   title?: string;
   unit?: string;
+  color: string;
+  level: string;
 }
 
 const DefectDensityMeter: React.FC<DefectDensityMeterProps> = ({
   value,
   size = 200,
   title = 'Defect Density',
+  color,
+  level,
 }) => {
-  // Define color based on defect density thresholds
-  const getColorForValue = (val: number) => {
-    if (val < 7) return '#10b981'; // Green for Low (0-7)
-    if (val <= 10) return '#f59e0b'; // Yellow for Medium (7-10)
-    return '#ef4444'; // Red for High (10+)
-  };
-
-  const getCurrentLevel = (val: number) => {
-    if (val < 7) return 'Low';
-    if (val <= 10) return 'Medium';
-    return 'High';
-  };
-
-  // Configure speedometer with proper segment distribution
-  // We'll use 15 segments to match our 0-15 scale, with proper color distribution
+  
   const maxValue = 15;
 
-  const currentColor = getColorForValue(value);
-  const currentLevel = getCurrentLevel(value);
+  const currentColor = color;
+  const currentLevel = level;
 
   return (
     <View style={styles.container}>

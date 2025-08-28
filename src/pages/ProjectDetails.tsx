@@ -16,7 +16,7 @@ import ProjectSelector from '../components/ProjectSelector';
 import SeverityBreakdown from '../components/SeverityBreakdown';
 import DefectIndicators from './DefectIndicators';
 import { useProjects } from '../hooks/useProjects';
-import { mockDefectData } from '../data/mockData';
+import { DefectData as DefectDataType } from '../types/api';
 
 type RootStackParamList = {
   ProjectDetails: {
@@ -52,48 +52,53 @@ const ProjectDetails = () => {
     return projectData ? projectData.risk : 'low';
   };
 
+  const getCurrentProjectId = () => {
+    const projectData = getProjectByName(selectedProject);
+    return projectData ? projectData.id : undefined;
+  };
+
   const currentRisk = getCurrentProjectRisk();
 
   const handleProjectSelect = (project: string) => {
     setSelectedProject(project);
   };
 
-  const getDefectData = () => {
+  const getDefectData = (): { high: DefectDataType; medium: DefectDataType; low: DefectDataType } => {
     const projectData = getProjectByName(selectedProject);
     return projectData
-      ? projectData.defectData
+      ? (projectData.defectData as unknown as { high: DefectDataType; medium: DefectDataType; low: DefectDataType })
       : {
-          high: {
-            total: 0,
-            reopen: 0,
-            closed: 0,
-            new: 0,
-            reject: 0,
-            open: 0,
-            duplicate: 0,
-            fixed: 0,
-          },
-          medium: {
-            total: 0,
-            reopen: 0,
-            closed: 0,
-            new: 0,
-            reject: 0,
-            open: 0,
-            duplicate: 0,
-            fixed: 0,
-          },
-          low: {
-            total: 0,
-            reopen: 0,
-            closed: 0,
-            new: 0,
-            reject: 0,
-            open: 0,
-            duplicate: 0,
-            fixed: 0,
-          },
-        };
+        high: {
+          total: 0,
+          reopen: 0,
+          closed: 0,
+          new: 0,
+          reject: 0,
+          open: 0,
+          duplicate: 0,
+          fixed: 0,
+        },
+        medium: {
+          total: 0,
+          reopen: 0,
+          closed: 0,
+          new: 0,
+          reject: 0,
+          open: 0,
+          duplicate: 0,
+          fixed: 0,
+        },
+        low: {
+          total: 0,
+          reopen: 0,
+          closed: 0,
+          new: 0,
+          reject: 0,
+          open: 0,
+          duplicate: 0,
+          fixed: 0,
+        },
+      };
   };
 
   const defectData = getDefectData();
@@ -168,8 +173,8 @@ const ProjectDetails = () => {
                   currentRisk === 'high'
                     ? '#c62828'
                     : currentRisk === 'medium'
-                    ? '#f9a825'
-                    : '#2ecc40',
+                      ? '#f9a825'
+                      : '#2ecc40',
               },
             ]}
           >
@@ -177,16 +182,15 @@ const ProjectDetails = () => {
               {currentRisk === 'high'
                 ? 'High Risk'
                 : currentRisk === 'medium'
-                ? 'Medium Risk'
-                : 'Low Risk'}
+                  ? 'Medium Risk'
+                  : 'Low Risk'}
             </Text>
           </View>
         </View>
-
-        <SeverityBreakdown defectData={mockDefectData} />
+        <SeverityBreakdown defectData={defectData as unknown as Record<string, DefectDataType>} />
 
         <View style={styles.indicatorsContainer}>
-          <DefectIndicators defectData={defectData} />
+          <DefectIndicators defectData={defectData} projectId={getCurrentProjectId()} />
         </View>
       </ScrollView>
       <Footer />

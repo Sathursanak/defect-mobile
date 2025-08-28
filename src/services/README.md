@@ -13,7 +13,7 @@ Main API service for project-related operations:
 
 ### `apiConfig.ts`
 Configuration constants for API:
-- Base URL: `http://localhost:3000/api`
+- Base URL: `http://192.168.1.49:3000/api`
 - Timeout settings
 - Error messages
 - HTTP status codes
