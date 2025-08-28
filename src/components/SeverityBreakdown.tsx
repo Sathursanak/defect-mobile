@@ -136,7 +136,7 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
     critical: { title: 'Critical', color: '#b71c1c' },
     blocker: { title: 'Blocker', color: '#88470eff' },
     high: { title: 'High', color: '#c62828' },
-    medium: { title: 'Medium', color: '#f9a825' },
+    medium: { title: 'Medium', color: '#f59e0b' },
     low: { title: 'Low', color: '#2ecc40' },
     minor: { title: 'Minor', color: '#039be5' },
   };

@@ -11,6 +11,7 @@ import TimeToFixChart from '../components/TimeToFixChart';
 import DefectsByModuleChart from '../components/DefectsByModuleChart';
 import { calculateTotalDefects } from '../data/mockData';
 import { getDefectDensity } from '../services/defectdensity';
+import { getDefectRemarkRatio, DefectRemarkRatioResponseItem } from '../services/defectRemarkRatio';
 
 interface DefectData {
   total: number;
@@ -39,6 +40,14 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, project
   const [densityColor, setDensityColor] = useState<string | undefined>(undefined);
   const [densityLevel, setDensityLevel] = useState<string | undefined>(undefined);
 
+  const [ratioPercent, setRatioPercent] = useState<number | null>(null);
+  const [ratioLevel, setRatioLevel] = useState<string | null>(null);
+  const [ratioColor, setRatioColor] = useState<string | null>(null);
+  const [ratioValidDefects, setRatioValidDefects] = useState<number | null>(null);
+  const [ratioTotalDefects, setRatioTotalDefects] = useState<number | null>(null);
+  const [ratioLoading, setRatioLoading] = useState<boolean>(false);
+  const [ratioError, setRatioError] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchDensity = async () => {
       if (!projectId) {
@@ -62,6 +71,46 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, project
       }
     };
     fetchDensity();
+  }, [projectId]);
+
+  useEffect(() => {
+    const fetchRemarkRatio = async () => {
+      if (!projectId) {
+        setRatioPercent(null);
+        setRatioLevel(null);
+        setRatioColor(null);
+        setRatioValidDefects(null);
+        setRatioTotalDefects(null);
+        return;
+      }
+      try {
+        setRatioLoading(true);
+        setRatioError(null);
+        const data = await getDefectRemarkRatio(projectId);
+        const item: DefectRemarkRatioResponseItem = Array.isArray(data) ? data[0] : data;
+        setRatioPercent(item?.defect_to_remark_ratio_percent ?? null);
+        setRatioLevel(item?.remark_ratio_level ?? null);
+        setRatioColor(item?.remark_ratio_color ?? null);
+        // also keep counts for display consistency
+        const parseNum = (v: number | string | null | undefined): number | null => {
+          if (v === null || v === undefined) return null;
+          const n = typeof v === 'string' ? Number(v) : v;
+          return isNaN(Number(n)) ? null : Number(n);
+        };
+        setRatioValidDefects(parseNum(item?.valid_defects as any));
+        setRatioTotalDefects(parseNum(item?.total_defects as any));
+      } catch (e) {
+        setRatioError('Failed to load defect remark ratio');
+        setRatioPercent(null);
+        setRatioLevel(null);
+        setRatioColor(null);
+        setRatioValidDefects(null);
+        setRatioTotalDefects(null);
+      } finally {
+        setRatioLoading(false);
+      }
+    };
+    fetchRemarkRatio();
   }, [projectId]);
   // Calculate overall metrics using centralized function
   const totalDefects = calculateTotalDefects(defectData);
@@ -128,11 +177,20 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, project
           <Ionicons name="chatbubbles-outline" size={24} color="#10b981" />
           <Text style={styles.containerTitle}>Defect to Remark Ratio</Text>
         </View>
-        <DefectRemarkRatioCard
-          defectCount={totalDefects}
-          remarkCount={totalRemarks}
-          title=""
-        />
+        {ratioLoading ? (
+          <Text style={styles.metricDescription}>Loading...</Text>
+        ) : ratioError ? (
+          <Text style={[styles.metricDescription, { color: '#ef4444' }]}>{ratioError}</Text>
+        ) : (
+          <DefectRemarkRatioCard
+            defectCount={ratioValidDefects ?? 0}
+            remarkCount={ratioTotalDefects ?? 0}
+            percentOverride={ratioPercent}
+            levelOverride={ratioLevel}
+            colorOverride={ratioColor}
+            title=""
+          />
+        )}
       </View>
 
       {/* Defects Reopened Multiple Times */}

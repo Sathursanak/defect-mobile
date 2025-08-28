@@ -2,34 +2,41 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 interface DefectRemarkRatioCardProps {
-  defectCount: number;
-  remarkCount: number;
+  defectCount: number; // valid defects
+  remarkCount: number; // total defects (remarks)
   title?: string;
+  percentOverride?: number | null;
+  levelOverride?: string | null;
+  colorOverride?: string | null;
 }
 
 const DefectRemarkRatioCard: React.FC<DefectRemarkRatioCardProps> = ({
   defectCount,
   remarkCount,
   title = 'Defect to Remark Ratio',
+  percentOverride,
+  
 }) => {
-  // Calculate percentage: (defects / (defects + remarks)) * 100
-  const totalItems = defectCount + remarkCount;
-  const percentage = totalItems > 0 ? (defectCount / totalItems) * 100 : 0;
-  const displayPercentage = percentage.toFixed(2);
+  // Calculate percentage from inputs only if backend override is missing
+  // remarkCount is total defects; percent = valid / total * 100
+  const denominator = remarkCount;
+  const fallbackPercent = denominator > 0 ? (defectCount / denominator) * 100 : 0;
+  const percentage = percentOverride ?? fallbackPercent;
+  const displayPercentage = (percentage ?? 0).toFixed(2);
 
-  // Determine severity level based on percentage
-  const getSeverityLevel = (percentage: number) => {
-    if (percentage <= 30) return { level: 'Low', color: '#10b981' };
-    if (percentage <= 60) return { level: 'Medium', color: '#f59e0b' };
+  // Determine severity level/color only if backend doesn't provide
+  const getSeverityLevel = (pct: number) => {
+    if (pct >= 98) return { level: 'Low', color: '#10b981' };
+    if (pct >= 90) return { level: 'Medium', color: '#f59e0b' };
     return { level: 'High', color: '#ef4444' };
   };
 
-  const severity = getSeverityLevel(percentage);
+  const severity = getSeverityLevel(percentage ?? 0);
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{title}</Text>
-      
+
       <View style={[styles.card, { backgroundColor: severity.color + '20' }]}>
         <Text style={[styles.percentage, { color: severity.color }]}>
           {displayPercentage}%
@@ -37,7 +44,7 @@ const DefectRemarkRatioCard: React.FC<DefectRemarkRatioCardProps> = ({
         <Text style={styles.subtitle}>
           Defect to Remark Ratio (%)
         </Text>
-        
+
         <View style={[styles.severityBadge, { backgroundColor: severity.color }]}>
           <Text style={styles.severityText}>{severity.level}</Text>
         </View>
@@ -45,16 +52,12 @@ const DefectRemarkRatioCard: React.FC<DefectRemarkRatioCardProps> = ({
 
       <View style={styles.detailsContainer}>
         <View style={styles.detailItem}>
-          <Text style={styles.detailLabel}>Defects</Text>
+          <Text style={styles.detailLabel}>Valid Defects</Text>
           <Text style={styles.detailValue}>{defectCount}</Text>
         </View>
         <View style={styles.detailItem}>
           <Text style={styles.detailLabel}>Remarks</Text>
           <Text style={styles.detailValue}>{remarkCount}</Text>
-        </View>
-        <View style={styles.detailItem}>
-          <Text style={styles.detailLabel}>Total</Text>
-          <Text style={styles.detailValue}>{totalItems}</Text>
         </View>
       </View>
     </View>
