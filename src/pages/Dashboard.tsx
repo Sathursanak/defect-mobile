@@ -133,7 +133,7 @@ const Dashboard = () => {
           <Text style={styles.errorText}>Failed to load projects</Text>
           <Text style={styles.errorSubText}>{error}</Text>
           <Text style={styles.debugText}>
-            API URL: http://192.168.8.120:3000/api/projects{'\n'}
+            API URL: http://192.168.1.49:3000/api/projects{'\n'}
             Check if server is running and accessible
           </Text>
           <TouchableOpacity style={styles.retryButton} onPress={refetch}>

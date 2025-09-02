@@ -12,6 +12,7 @@ import DefectsByModuleChart from '../components/DefectsByModuleChart';
 import { calculateTotalDefects } from '../data/mockData';
 import { getDefectDensity } from '../services/defectdensity';
 import { getDefectRemarkRatio, DefectRemarkRatioResponseItem } from '../services/defectRemarkRatio';
+import { getSeverityIndex, SeverityIndexItem } from '../services/severityIndex';
 
 interface DefectData {
   total: number;
@@ -48,6 +49,13 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, project
   const [ratioLoading, setRatioLoading] = useState<boolean>(false);
   const [ratioError, setRatioError] = useState<string | null>(null);
 
+  // Severity Index states
+  const [severityPercent, setSeverityPercent] = useState<number | null>(null);
+  const [severityLevel, setSeverityLevel] = useState<string | null>(null);
+  const [severityColor, setSeverityColor] = useState<string | null>(null);
+  const [severityLoading, setSeverityLoading] = useState<boolean>(false);
+  const [severityError, setSeverityError] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchDensity = async () => {
       if (!projectId) {
@@ -71,6 +79,36 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, project
       }
     };
     fetchDensity();
+  }, [projectId]);
+
+  useEffect(() => {
+    const fetchSeverityIndex = async () => {
+      if (!projectId) {
+        setSeverityPercent(null);
+        setSeverityLevel(null);
+        setSeverityColor(null);
+        return;
+      }
+      try {
+        setSeverityLoading(true);
+        setSeverityError(null);
+        const data = await getSeverityIndex(projectId);
+        const item: SeverityIndexItem = Array.isArray(data) ? data[0] : data;
+        setSeverityPercent(
+          typeof item?.severity_index_percent === 'number' ? item.severity_index_percent : null
+        );
+        setSeverityLevel(item?.severity_index_level ?? null);
+        setSeverityColor(item?.severity_index_color ?? null);
+      } catch (e) {
+        setSeverityError('Failed to load severity index');
+        setSeverityPercent(null);
+        setSeverityLevel(null);
+        setSeverityColor(null);
+      } finally {
+        setSeverityLoading(false);
+      }
+    };
+    fetchSeverityIndex();
   }, [projectId]);
 
   useEffect(() => {
@@ -117,16 +155,8 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, project
 
   const defectDensity = densityValue.toFixed(2);
 
-  // Defect Severity Index (weighted average: High=3, Medium=2, Low=1)
-  const severityIndex =
-    totalDefects > 0
-      ? (
-        (defectData.high.total * 3 +
-          defectData.medium.total * 2 +
-          defectData.low.total * 1) /
-        totalDefects
-      ).toFixed(2)
-      : '0.00';
+  // Map severity percent (0-100) to component's expected value (0-3)
+  const severityIndexValue = severityPercent == null ? 0 : Number(((severityPercent / 100) * 3).toFixed(2));
 
   // Placeholder until remarks API is integrated
   const totalRemarks = 0;
@@ -164,11 +194,22 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, project
           <Ionicons name="warning-outline" size={24} color="#f59e0b" />
           <Text style={styles.containerTitle}>Defect Severity Index</Text>
         </View>
-        <SeverityIndexIndicator
-          value={parseFloat(severityIndex)}
-          size={200}
-          title=""
-        />
+        {severityLoading ? (
+          <Text style={styles.metricDescription}>Loading...</Text>
+        ) : severityError ? (
+          <Text style={[styles.metricDescription, { color: '#ef4444' }]}>{severityError}</Text>
+        ) : (
+          <SeverityIndexIndicator
+            value={severityIndexValue}
+            size={200}
+            title=""
+          />
+        )}
+        {severityLevel && (
+          <Text style={[styles.metricDescription, { marginTop: 8, color: severityColor || '#374151' }]}>
+            Level: {severityLevel}
+          </Text>
+        )}
       </View>
 
       {/* Defect to Remark Ratio */}

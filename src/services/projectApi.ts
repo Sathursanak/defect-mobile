@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 import { ProjectsApiResponse, ProjectData, DefectData } from "../types/api";
 
-const API_BASE_URL = "http://192.168.8.120:3000/api";
+const API_BASE_URL = "http://192.168.1.49:3000/api";
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,

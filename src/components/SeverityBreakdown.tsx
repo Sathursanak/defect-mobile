@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,24 +7,14 @@ import {
   Modal,
   Dimensions,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import { MaterialIcons } from '@expo/vector-icons';
 import PieChart from 'react-native-pie-chart';
-
-interface DefectData {
-  total: number;
-  reopen: number;
-  closed: number;
-  new: number;
-  reject: number;
-  open: number;
-  duplicate: number;
-  fixed: number;
-}
+import { severityBreakdownApi, SeverityBreakdownItem, StatusBreakdownItem } from '../services/severityBreakdown';
 
 interface SeverityBreakdownProps {
-  defectData: Record<string, DefectData>;
+  projectId: number;
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -38,15 +28,39 @@ const getCardWidth = () => {
 };
 
 const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
-  defectData,
+  projectId,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedSeverity, setSelectedSeverity] = useState<string>('high');
+  const [selectedSeverity, setSelectedSeverity] = useState<SeverityBreakdownItem | null>(null);
+  const [severityData, setSeverityData] = useState<SeverityBreakdownItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<ScrollView>(null);
   const [scrollX, setScrollX] = useState(0);
 
   // Scroll amount per click (in px)
   const SCROLL_AMOUNT = getCardWidth() + 8; // card width + gap
+
+  // Fetch severity breakdown data when project changes
+  useEffect(() => {
+    if (projectId) {
+      fetchSeverityBreakdown();
+    }
+  }, [projectId]);
+
+  const fetchSeverityBreakdown = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await severityBreakdownApi.getSeverityBreakdown(projectId);
+      setSeverityData(data);
+    } catch (err) {
+      console.error('Failed to fetch severity breakdown:', err);
+      setError('Failed to load severity data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleScrollLeft = () => {
     if (scrollRef.current) {
@@ -56,6 +70,7 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
       });
     }
   };
+
   const handleScrollRight = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -65,22 +80,21 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
     }
   };
 
-  const handleViewChart = (severity: string) => {
+  const handleViewChart = (severity: SeverityBreakdownItem) => {
     setSelectedSeverity(severity);
     setModalVisible(true);
   };
 
-  const renderPieChart = (data: DefectData) => {
-    const total = data.total;
-    const segments = [
-      { value: data.new, color: '#3b82f6', label: 'NEW' },
-      { value: data.fixed, color: '#22c55e', label: 'FIXED' },
-      { value: data.closed, color: '#16a34a', label: 'CLOSED' },
-      { value: data.open, color: '#eab308', label: 'OPEN' },
-      { value: data.reopen, color: '#ef4444', label: 'REOPEN' },
-      { value: data.reject, color: '#7f1d1d', label: 'REJECT' },
-      { value: data.duplicate, color: '#6b7280', label: 'DUPLICATE' },
-    ].filter(segment => segment.value > 0);
+  const renderPieChart = (severity: SeverityBreakdownItem) => {
+    const total = severity.total_defects;
+    const statusBreakdown = severity.status_breakdown;
+
+    // Convert status breakdown to chart segments
+    const segments = Object.values(statusBreakdown).map(status => ({
+      value: status.count,
+      color: status.status_color,
+      label: status.status_name.toUpperCase(),
+    })).filter(segment => segment.value > 0);
 
     // Prepare data for PieChart component
     const widthAndHeight = 200;
@@ -130,19 +144,46 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
     );
   };
 
-  // Map severity keys to display names and colors
-  // Add or edit severities here as needed
-  const severityMeta: Record<string, { title: string; color: string }> = {
-    critical: { title: 'Critical', color: '#b71c1c' },
-    blocker: { title: 'Blocker', color: '#88470eff' },
-    high: { title: 'High', color: '#c62828' },
-    medium: { title: 'Medium', color: '#f59e0b' },
-    low: { title: 'Low', color: '#2ecc40' },
-    minor: { title: 'Minor', color: '#039be5' },
+  // Helper function to get severity color
+  const getSeverityColor = (severityColor: string): string => {
+    const colorMap: Record<string, string> = {
+      'Red': '#dc2626',
+      'Orange': '#ea580c',
+      'Yellow': '#ca8a04',
+      'Green': '#16a34a',
+      'Blue': '#2563eb',
+      'Purple': '#9333ea',
+    };
+    return colorMap[severityColor] || '#6b7280';
   };
 
-  // Dynamically get all severities from defectData
-  const severities = Object.keys(defectData);
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#1a2a5c" />
+        <Text style={styles.loadingText}>Loading severity data...</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={fetchSeverityBreakdown}>
+          <Text style={styles.retryButtonText}>Retry</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  if (severityData.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text style={styles.emptyText}>No severity data available for this project</Text>
+      </View>
+    );
+  }
 
   return (
     <View>
@@ -168,78 +209,65 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
           onScroll={e => setScrollX(e.nativeEvent.contentOffset.x)}
           scrollEventThrottle={16}
         >
-          {severities.map(key => {
-            const data = defectData[key];
-            const meta = severityMeta[key] ||
-              severityMeta.default || { title: key, color: '#888' };
+          {severityData.map((severity) => {
+            const severityColor = getSeverityColor(severity.severity_color);
             return (
               <View
-                key={key}
+                key={severity.severity_id}
                 style={[
                   styles.defectCard,
-                  { borderTopColor: meta.color, width: getCardWidth() },
+                  { borderTopColor: severityColor, width: getCardWidth() },
                 ]}
               >
                 <View style={styles.cardHeader}>
                   <Text
-                    style={[styles.defectCardTitle, { color: meta.color }]}
+                    style={[styles.defectCardTitle, { color: severityColor }]}
                     numberOfLines={2}
                     ellipsizeMode="tail"
                   >
-                    {meta.title}
+                    {severity.severity_name}
                   </Text>
-                  <Text style={styles.defectTotal}>{data.total}</Text>
+                  <Text style={styles.defectTotal}>{severity.total_defects}</Text>
                 </View>
 
                 <View style={styles.defectStatsGrid}>
-                  {/* Render all statuses dynamically */}
-                  {Object.entries(data).map(([status, value]) => {
-                    if (status === 'total') return null;
-                    // Assign a color for each status (customize as needed)
-                    const statusColors: Record<string, string> = {
-                      reopen: '#c62828',
-                      closed: '#2ecc40',
-                      new: '#f9a825',
-                      fixed: '#3b82f6',
-                      open: '#eab308',
-                      reject: '#7f1d1d',
-                      duplicate: '#6b7280',
-                    };
-                    return (
-                      <View style={styles.statItem} key={status}>
-                        <View
-                          style={[
-                            styles.dot,
-                            { backgroundColor: statusColors[status] || '#bbb' },
-                          ]}
-                        />
-                        <Text
-                          style={styles.statText}
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                        >
-                          {status.toUpperCase()}
-                        </Text>
-                        <Text style={styles.statValue}>{value}</Text>
-                      </View>
-                    );
-                  })}
+                  {/* Render status breakdown dynamically */}
+                  {Object.values(severity.status_breakdown).map((status) => (
+                    <View style={styles.statItem} key={status.status_id}>
+                      <View
+                        style={[
+                          styles.dot,
+                          { backgroundColor: status.status_color },
+                        ]}
+                      />
+                      <Text
+                        style={styles.statText}
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                      >
+                        {status.status_name.toUpperCase()}
+                      </Text>
+                      <Text style={styles.statValue}>{status.count}</Text>
+                    </View>
+                  ))}
                 </View>
 
-                <TouchableOpacity
-                  style={[
-                    styles.viewChartButton,
-                    {
-                      backgroundColor: meta.color + '20',
-                      borderColor: meta.color,
-                    },
-                  ]}
-                  onPress={() => handleViewChart(key)}
-                >
-                  <Text style={[styles.viewChartText, { color: meta.color }]}>
-                    View Chart
-                  </Text>
-                </TouchableOpacity>
+                <View style={styles.buttonContainer}>
+                  <TouchableOpacity
+                    style={[
+                      styles.viewChartButton,
+                      {
+                        backgroundColor: severityColor + '20',
+                        borderColor: severityColor,
+                      },
+                    ]}
+                    onPress={() => handleViewChart(severity)}
+                  >
+                    <Text style={[styles.viewChartText, { color: severityColor }]}>
+                      View Chart
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             );
           })}
@@ -265,14 +293,13 @@ const SeverityBreakdown: React.FC<SeverityBreakdownProps> = ({
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {(severityMeta[selectedSeverity]?.title || selectedSeverity) +
-                  ' Chart'}
+                {selectedSeverity?.severity_name} Chart
               </Text>
               <TouchableOpacity onPress={() => setModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#6b7280" />
               </TouchableOpacity>
             </View>
-            {renderPieChart(defectData[selectedSeverity])}
+            {selectedSeverity && renderPieChart(selectedSeverity)}
           </View>
         </View>
       </Modal>
@@ -287,6 +314,45 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     paddingHorizontal: 16,
     marginBottom: 16,
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#6b7280',
+  },
+  errorContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#dc2626',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: '#1a2a5c',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  retryButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptyContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#6b7280',
+    textAlign: 'center',
   },
   defectCardsScrollContainer: {
     flexDirection: 'row',
@@ -306,6 +372,8 @@ const styles = StyleSheet.create({
     elevation: 2,
     minHeight: 160,
     marginRight: 8,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
   },
   cardHeader: {
     alignItems: 'center',
@@ -327,6 +395,11 @@ const styles = StyleSheet.create({
   defectStatsGrid: {
     marginBottom: 12,
     paddingHorizontal: 2,
+    flex: 1,
+  },
+  buttonContainer: {
+    marginTop: 'auto',
+    paddingTop: 8,
   },
   statItem: {
     flexDirection: 'row',
@@ -358,15 +431,14 @@ const styles = StyleSheet.create({
   },
   viewChartButton: {
     alignSelf: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 16,
     borderWidth: 1,
-    marginTop: 4,
-    minWidth: 80,
+    minWidth: 90,
   },
   viewChartText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     textAlign: 'center',
   },

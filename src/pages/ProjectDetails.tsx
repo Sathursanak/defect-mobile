@@ -187,7 +187,7 @@ const ProjectDetails = () => {
             </Text>
           </View>
         </View>
-        <SeverityBreakdown defectData={defectData as unknown as Record<string, DefectDataType>} />
+        <SeverityBreakdown projectId={getCurrentProjectId() || 1} />
 
         <View style={styles.indicatorsContainer}>
           <DefectIndicators defectData={defectData} projectId={getCurrentProjectId()} />

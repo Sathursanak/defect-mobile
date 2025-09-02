@@ -1,6 +1,6 @@
 
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.8.120:3000/api', // Your computer's IP address
+  BASE_URL: 'http://192.168.1.49:3000/api', // Your computer's IP address
   TIMEOUT: 10000,
   HEADERS: {
     'Content-Type': 'application/json',

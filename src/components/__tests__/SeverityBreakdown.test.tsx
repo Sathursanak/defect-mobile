@@ -1,94 +1,146 @@
-// Simple unit tests for pie chart data processing
+// Unit tests for SeverityBreakdown component with new API structure
 
-const mockDefectData = {
-  high: {
-    total: 25,
-    reopen: 3,
-    closed: 8,
-    new: 5,
-    reject: 2,
-    open: 4,
-    duplicate: 1,
-    fixed: 2,
+import { SeverityBreakdownItem, StatusBreakdownItem } from '../../services/severityBreakdown';
+
+const mockSeverityData: SeverityBreakdownItem[] = [
+  {
+    severity_id: 1,
+    severity_name: 'Critical',
+    severity_color: 'Red',
+    weight: '5',
+    total_defects: 25,
+    status_breakdown: {
+      '1': {
+        status_id: 1,
+        status_name: 'New',
+        status_color: '#FF0000',
+        count: 5,
+      },
+      '2': {
+        status_id: 2,
+        status_name: 'Reopen',
+        status_color: '#FFA500',
+        count: 3,
+      },
+      '3': {
+        status_id: 3,
+        status_name: 'Open',
+        status_color: '#0000FF',
+        count: 4,
+      },
+      '4': {
+        status_id: 4,
+        status_name: 'Fixed',
+        status_color: '#008000',
+        count: 8,
+      },
+      '5': {
+        status_id: 5,
+        status_name: 'Closed',
+        status_color: '#16a34a',
+        count: 5,
+      },
+    },
   },
-  medium: {
-    total: 15,
-    reopen: 2,
-    closed: 5,
-    new: 3,
-    reject: 1,
-    open: 2,
-    duplicate: 1,
-    fixed: 1,
+  {
+    severity_id: 2,
+    severity_name: 'High',
+    severity_color: 'Orange',
+    weight: '4',
+    total_defects: 15,
+    status_breakdown: {
+      '1': {
+        status_id: 1,
+        status_name: 'New',
+        status_color: '#FF0000',
+        count: 3,
+      },
+      '3': {
+        status_id: 3,
+        status_name: 'Open',
+        status_color: '#0000FF',
+        count: 2,
+      },
+      '4': {
+        status_id: 4,
+        status_name: 'Fixed',
+        status_color: '#008000',
+        count: 5,
+      },
+      '5': {
+        status_id: 5,
+        status_name: 'Closed',
+        status_color: '#16a34a',
+        count: 5,
+      },
+    },
   },
-  low: {
-    total: 10,
-    reopen: 1,
-    closed: 3,
-    new: 2,
-    reject: 0,
-    open: 2,
-    duplicate: 1,
-    fixed: 1,
-  },
-};
+];
 
-describe('SeverityBreakdown', () => {
-  it('should have correct pie chart data structure', () => {
-    // Test the data structure that would be passed to PieChart
-    const data = mockDefectData.high;
-    const segments = [
-      { value: data.new, color: '#3b82f6', label: 'NEW' },
-      { value: data.fixed, color: '#22c55e', label: 'FIXED' },
-      { value: data.closed, color: '#16a34a', label: 'CLOSED' },
-      { value: data.open, color: '#eab308', label: 'OPEN' },
-      { value: data.reopen, color: '#ef4444', label: 'REOPEN' },
-      { value: data.reject, color: '#7f1d1d', label: 'REJECT' },
-      { value: data.duplicate, color: '#6b7280', label: 'DUPLICATE' },
-    ].filter(segment => segment.value > 0);
+describe('SeverityBreakdown API Data Processing', () => {
+  it('should have correct severity data structure', () => {
+    const criticalSeverity = mockSeverityData[0];
 
-    const series = segments.map(segment => ({
-      value: segment.value,
-      color: segment.color,
-    }));
-
-    // Verify the series structure is correct for PieChart
-    expect(series).toHaveLength(7); // All segments have values > 0
-    expect(series[0]).toEqual({ value: 5, color: '#3b82f6' }); // NEW
-    expect(series[1]).toEqual({ value: 2, color: '#22c55e' }); // FIXED
-
-    // Verify total calculation
-    const total = series.reduce((sum, item) => sum + item.value, 0);
-    expect(total).toBe(25);
+    expect(criticalSeverity.severity_id).toBe(1);
+    expect(criticalSeverity.severity_name).toBe('Critical');
+    expect(criticalSeverity.severity_color).toBe('Red');
+    expect(criticalSeverity.total_defects).toBe(25);
+    expect(Object.keys(criticalSeverity.status_breakdown)).toHaveLength(5);
   });
 
-  it('should calculate percentages correctly', () => {
-    const data = mockDefectData.high;
-    const total = data.total;
+  it('should have correct status breakdown structure', () => {
+    const criticalSeverity = mockSeverityData[0];
+    const newStatus = criticalSeverity.status_breakdown['1'];
 
-    // Test percentage calculation for NEW defects
-    const newPercentage = ((data.new / total) * 100).toFixed(1);
-    expect(newPercentage).toBe('20.0'); // 5/25 = 20%
-
-    // Test percentage calculation for CLOSED defects
-    const closedPercentage = ((data.closed / total) * 100).toFixed(1);
-    expect(closedPercentage).toBe('32.0'); // 8/25 = 32%
+    expect(newStatus.status_id).toBe(1);
+    expect(newStatus.status_name).toBe('New');
+    expect(newStatus.status_color).toBe('#FF0000');
+    expect(newStatus.count).toBe(5);
   });
 
-  it('should filter out zero-value segments', () => {
-    const data = mockDefectData.low; // This has reject: 0
-    const segments = [
-      { value: data.new, color: '#3b82f6', label: 'NEW' },
-      { value: data.fixed, color: '#22c55e', label: 'FIXED' },
-      { value: data.closed, color: '#16a34a', label: 'CLOSED' },
-      { value: data.open, color: '#eab308', label: 'OPEN' },
-      { value: data.reopen, color: '#ef4444', label: 'REOPEN' },
-      { value: data.reject, color: '#7f1d1d', label: 'REJECT' },
-      { value: data.duplicate, color: '#6b7280', label: 'DUPLICATE' },
-    ].filter(segment => segment.value > 0);
+  it('should calculate total defects correctly from status breakdown', () => {
+    const criticalSeverity = mockSeverityData[0];
+    const totalFromBreakdown = Object.values(criticalSeverity.status_breakdown)
+      .reduce((sum, status) => sum + status.count, 0);
 
-    // Should exclude REJECT since it has value 0
-    expect(segments).toHaveLength(6);
-    expect(segments.find(s => s.label === 'REJECT')).toBeUndefined();
+    expect(totalFromBreakdown).toBe(25);
+    expect(totalFromBreakdown).toBe(criticalSeverity.total_defects);
+  });
+
+  it('should filter out zero-count statuses for pie chart', () => {
+    const criticalSeverity = mockSeverityData[0];
+    const segments = Object.values(criticalSeverity.status_breakdown)
+      .filter(status => status.count > 0)
+      .map(status => ({
+        value: status.count,
+        color: status.status_color,
+        label: status.status_name.toUpperCase(),
+      }));
+
+    // All statuses have count > 0, so should include all 5
+    expect(segments).toHaveLength(5);
+    expect(segments.find(s => s.label === 'NEW')).toBeDefined();
+    expect(segments.find(s => s.label === 'FIXED')).toBeDefined();
+  });
+
+  it('should handle multiple severities correctly', () => {
+    expect(mockSeverityData).toHaveLength(2);
+
+    const criticalSeverity = mockSeverityData[0];
+    const highSeverity = mockSeverityData[1];
+
+    expect(criticalSeverity.severity_name).toBe('Critical');
+    expect(highSeverity.severity_name).toBe('High');
+    expect(criticalSeverity.total_defects).toBeGreaterThan(highSeverity.total_defects);
+  });
+
+  it('should have consistent status IDs across severities', () => {
+    const criticalSeverity = mockSeverityData[0];
+    const highSeverity = mockSeverityData[1];
+    const criticalStatusIds = Object.keys(criticalSeverity.status_breakdown).map(Number);
+    const highStatusIds = Object.keys(highSeverity.status_breakdown).map(Number);
+
+    // Status IDs should be consistent (1, 3, 4, 5 for High severity)
+    expect(highStatusIds).toEqual([1, 3, 4, 5]);
   });
 });

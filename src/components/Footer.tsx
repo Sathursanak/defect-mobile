@@ -10,6 +10,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import NotificationBell from './NotificationBell';
 import Profile from './Profile';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 interface FooterProps {
   style?: ViewStyle;
@@ -22,11 +23,27 @@ const Footer: React.FC<FooterProps> = ({ style }) => {
 
   // Update active tab based on current route
   useEffect(() => {
-    if (route.name === 'Dashboard') {
+  let currentRoute = route.name;
+
+  // if this route has nested children (like Dashboard stack)
+  const nestedRoute = getFocusedRouteNameFromRoute(route) ?? '';
+
+  if (route.name === 'Dashboard') {
+    if (nestedRoute === '' || nestedRoute === 'DashboardHome') {
+      // only when on the main dashboard page
       setActiveTab('home');
+    } else {
+      // inside something like ProjectDetail
+      setActiveTab('');
     }
-    // Add other route mappings as needed
-  }, [route.name]);
+  } else if (route.name === 'Notifications') {
+    setActiveTab('notifications');
+  } else if (route.name === 'Profile') {
+    setActiveTab('profile');
+  } else {
+    setActiveTab('');
+  }
+}, [route]);
 
   const handleTabPress = (tabName: string, onPress?: () => void) => {
     setActiveTab(tabName);

@@ -28,6 +28,32 @@ export interface DefectData {
   fixed: number;
 }
 
+// New types for severity breakdown API
+export interface StatusBreakdownItem {
+  status_id: number;
+  status_name: string;
+  status_color: string;
+  count: number;
+}
+
+export interface SeverityBreakdownItem {
+  severity_id: number;
+  severity_name: string;
+  severity_color: string;
+  weight: string;
+  total_defects: number;
+  status_breakdown: Record<string, StatusBreakdownItem>;
+}
+
+export interface SeverityIndexItem {
+  id: number;
+  project_name: string;
+  valid_defects: number;
+  severity_index_percent: number;
+  severity_index_level: string;
+  severity_index_color: string;
+}
+
 export interface ApiResponse<T> {
   status: string;
   message: string;
