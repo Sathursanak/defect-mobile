@@ -284,10 +284,8 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, project
           <Ionicons name="layers-outline" size={24} color="#f59e0b" />
           <Text style={styles.containerTitle}>Defects by Module</Text>
         </View>
-        <DefectsByModuleChart defectData={defectData} />
-        <Text style={styles.metricDescription}>
-          Distribution of defects across different modules
-        </Text>
+        <DefectsByModuleChart projectId={projectId || 1} />
+        
       </View>
     </ScrollView>
   );

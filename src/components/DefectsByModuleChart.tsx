@@ -1,92 +1,80 @@
-import React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, ActivityIndicator } from 'react-native';
 import PieChart from 'react-native-pie-chart';
-import { getDefectBreakdown } from '../data/mockData';
-
-interface DefectData {
-  total: number;
-  reopen: number;
-  closed: number;
-  new: number;
-  reject: number;
-  open: number;
-  duplicate: number;
-  fixed: number;
-}
+import { getDefectsByModule, ModuleItem } from '../services/defectsByModule';
 
 interface DefectsByModuleChartProps {
-  defectData: {
-    high: DefectData;
-    medium: DefectData;
-    low: DefectData;
-  };
+  projectId: number;
 }
 
 const DefectsByModuleChart: React.FC<DefectsByModuleChartProps> = ({
-  defectData,
+  projectId,
 }) => {
   const widthAndHeight = 220;
+  const [moduleData, setModuleData] = useState<ModuleItem[]>([]);
+  const [totalValidDefects, setTotalValidDefects] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Use centralized defect breakdown calculation
-  const breakdown = getDefectBreakdown(defectData);
+  useEffect(() => {
+    const fetchDefectsByModule = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await getDefectsByModule(projectId);
+        setModuleData(data.modules);
+        setTotalValidDefects(data.total_valid_defects);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch defects by module');
+        console.error('Error fetching defects by module:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  // Calculate module distribution proportionally
-  const authDefects = Math.round(breakdown.totalDefects * 0.3); // 30%
-  const dashboardDefects = Math.round(breakdown.totalDefects * 0.25); // 25%
-  const reportsDefects = Math.round(breakdown.totalDefects * 0.2); // 20%
-  const settingsDefects = Math.round(breakdown.totalDefects * 0.15); // 15%
-  const apiDefects =
-    breakdown.totalDefects -
-    (authDefects + dashboardDefects + reportsDefects + settingsDefects); // Remaining
+    fetchDefectsByModule();
+  }, [projectId]);
 
-  const moduleData = [
-    {
-      value: authDefects,
-      color: '#3b82f6',
-      label: { text: 'Auth', fontSize: 10 },
-    },
-    {
-      value: dashboardDefects,
-      color: '#10b981',
-      label: { text: 'Dashboard', fontSize: 10 },
-    },
-    {
-      value: reportsDefects,
-      color: '#f59e0b',
-      label: { text: 'Reports', fontSize: 10 },
-    },
-    {
-      value: settingsDefects,
-      color: '#ef4444',
-      label: { text: 'Settings', fontSize: 10 },
-    },
-    {
-      value: apiDefects,
-      color: '#8b5cf6',
-      label: { text: 'API', fontSize: 10 },
-    },
-  ].filter(item => item.value > 0);
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#4285F4" />
+        <Text style={styles.loadingText}>Loading defects by module...</Text>
+      </View>
+    );
+  }
 
-  const total = breakdown.totalDefects;
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>Error: {error}</Text>
+      </View>
+    );
+  }
+
+  // All modules returned by API now have valid defects > 0
+  const moduleSeries = moduleData.map(item => ({
+    value: item.valid_defects,
+    color: item.module_color,
+    label: { text: item.module_name, fontSize: 10 },
+    originalValue: item.valid_defects
+  }));
 
   return (
     <View style={styles.container}>
-      <PieChart widthAndHeight={widthAndHeight} series={moduleData} />
+      <PieChart widthAndHeight={widthAndHeight} series={moduleSeries} />
       <View style={styles.legendContainer}>
-        {moduleData.map((module, index) => {
-          const percentage = ((module.value / total) * 100).toFixed(1);
+        {moduleSeries.map((item, index) => {
+          const percentage = totalValidDefects > 0 ? ((item.originalValue / totalValidDefects) * 100).toFixed(1) : '0.0';
           return (
             <Text key={index} style={styles.legend}>
-              <Text style={{ color: module.color }}>⬤</Text>{' '}
-              {module.label?.text}: {module.value} ({percentage}%)
+              <Text style={{ color: item.color }}>⬤</Text> {item.label?.text}:{' '}
+              {item.originalValue} ({percentage}%)
             </Text>
           );
         })}
         <Text style={[styles.total, { marginTop: 8 }]}>
-          {total} Total Defects
-        </Text>
-        <Text style={styles.common}>
-          {moduleData[0].value} Most Common: {moduleData[0].label?.text}
+          {totalValidDefects} Total Valid Defects
         </Text>
       </View>
     </View>
@@ -97,6 +85,13 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     padding: 20,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 16,
+    textAlign: 'center',
+    color: '#333',
   },
   legendContainer: {
     marginTop: 16,
@@ -112,11 +107,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  common: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    color: '#333',
+  loadingText: {
+    fontSize: 16,
+    color: '#666',
+    marginTop: 16,
     textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#ea4335',
+    textAlign: 'center',
+    padding: 20,
   },
 });
 
