@@ -6,7 +6,7 @@ const SeverityIndexDemo: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Severity Index Indicator Demo</Text>
-      
+
       <View style={styles.demoSection}>
         <Text style={styles.sectionTitle}>Low Severity (0.8)</Text>
         <SeverityIndexIndicator value={0.8} size={180} />
@@ -29,9 +29,9 @@ const SeverityIndexDemo: React.FC = () => {
 
       <View style={styles.demoSection}>
         <Text style={styles.sectionTitle}>Custom Title & Size</Text>
-        <SeverityIndexIndicator 
-          value={1.8} 
-          size={150} 
+        <SeverityIndexIndicator
+          value={1.8}
+          size={150}
           title="Project Risk Level"
         />
       </View>

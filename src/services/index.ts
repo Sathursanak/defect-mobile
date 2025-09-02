@@ -5,6 +5,7 @@ export { getDefectRemarkRatio } from './defectRemarkRatio';
 export { getDefectDensity } from './defectdensity';
 export { getSeverityIndex } from './severityIndex';
 export { severityBreakdownApi } from './severityBreakdown';
+export { getDefectDistributionByType } from './defectDistributionByType';
 
 // Re-export types for convenience
 export type {
@@ -14,5 +15,7 @@ export type {
   DefectData,
   SeverityBreakdownItem,
   StatusBreakdownItem,
-  SeverityIndexItem
+  SeverityIndexItem,
+  DefectTypeItem,
+  DefectDistributionResponse
 } from '../types/api';

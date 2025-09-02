@@ -251,7 +251,7 @@ const DefectIndicators: React.FC<DefectIndicatorsProps> = ({ defectData, project
           <Ionicons name="pie-chart-outline" size={24} color="#8b5cf6" />
           <Text style={styles.containerTitle}>Defect Distribution by Type</Text>
         </View>
-        <DefectDistributionChart defectData={defectData} />
+        <DefectDistributionChart projectId={projectId || 1} />
       </View>
 
       {/* Time to Find Defects */}

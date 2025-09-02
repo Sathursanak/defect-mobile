@@ -72,11 +72,11 @@ const SeverityIndexIndicator: React.FC<SeverityIndexIndicatorProps> = ({
   // Scale markers
   const scaleMarkers = [0, 25, 50, 75, 100];
 
-  // Get color based on severity level
+  // Get color based on severity level - matching backend rules
   const getColor = (severityPercentage: number) => {
-    if (severityPercentage <= 33) return '#10b981'; // Green for low severity
-    if (severityPercentage <= 66) return '#f59e0b'; // Yellow for medium severity
-    return '#ef4444'; // Red for high severity
+    if (severityPercentage < 25) return '#10b981'; // Green for <25%
+    if (severityPercentage < 50) return '#f59e0b'; // Yellow for 25-49%
+    return '#ef4444'; // Red for ≥50%
   };
 
   const indicatorColor = getColor(percentage);
@@ -166,6 +166,7 @@ const SeverityIndexIndicator: React.FC<SeverityIndexIndicatorProps> = ({
         <Text style={styles.valueLabel}>
           Weighted severity score (higher = more severe defects)
         </Text>
+        
       </View>
     </View>
   );
@@ -215,6 +216,14 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     textAlign: 'center',
     paddingHorizontal: 20,
+    marginBottom: 8,
+  },
+  thresholdLabel: {
+    fontSize: 11,
+    color: '#9ca3af',
+    textAlign: 'center',
+    paddingHorizontal: 20,
+    fontStyle: 'italic',
   },
 });
 

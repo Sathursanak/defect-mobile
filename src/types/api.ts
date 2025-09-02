@@ -54,6 +54,21 @@ export interface SeverityIndexItem {
   severity_index_color: string;
 }
 
+// Defect distribution by type types
+export interface DefectTypeItem {
+  defect_type_id: number;
+  defect_type_name: string;
+  defect_type_color: string;
+  total_defects: number;
+  valid_defects: number;
+  percentage: number;
+}
+
+export interface DefectDistributionResponse {
+  total_valid_defects: number;
+  defect_types: DefectTypeItem[];
+}
+
 export interface ApiResponse<T> {
   status: string;
   message: string;
