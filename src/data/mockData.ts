@@ -146,24 +146,9 @@ export const timeToFixData: ChartDataPoint[] = [
   { x: 'Day 10', y: 2 },
 ];
 
-export const defectsByModuleData: PieSlice[] = [
-  { value: 30, color: '#3b82f6', label: { text: 'Auth', fontSize: 10 } },
-  { value: 25, color: '#10b981', label: { text: 'Dashboard', fontSize: 10 } },
-  { value: 20, color: '#f59e0b', label: { text: 'Reports', fontSize: 10 } },
-  { value: 15, color: '#ef4444', label: { text: 'Settings', fontSize: 10 } },
-  { value: 10, color: '#8b5cf6', label: { text: 'API', fontSize: 10 } },
-];
-
 export const defectsReopenedData: PieSlice[] = [
   { value: 5, color: '#4285F4', label: { text: '2 times', fontSize: 12 } },
   { value: 1, color: '#fbbc05', label: { text: '4 times', fontSize: 12, offsetY: 10 } },
-];
-
-export const defectDistributionData: PieSlice[] = [
-  { value: 245, color: '#4285F4', label: { text: 'Functionality', fontSize: 10 } },
-  { value: 81, color: '#00bfae', label: { text: 'UI', fontSize: 10 } },
-  { value: 30, color: '#fbbc05', label: { text: 'Usability', fontSize: 10 } },
-  { value: 103, color: '#ea4335', label: { text: 'Validation', fontSize: 10 } },
 ];
 
 // Other mock metrics
@@ -191,8 +176,7 @@ export const getDefectBreakdown = (defectData: {
 }) => {
   const totalDefects = calculateTotalDefects(defectData);
 
-  // Calculate proportional distribution based on total defects
-  // Using the severity distribution as the base
+ 
   const highProportion = defectData.high.total / totalDefects;
   const mediumProportion = defectData.medium.total / totalDefects;
   const lowProportion = defectData.low.total / totalDefects;
@@ -212,67 +196,3 @@ export const getDefectBreakdown = (defectData: {
   };
 };
 
-// Example mock defect data for all severities (for demo/testing horizontal scroll)
-export const mockDefectData: Record<string, DefectData> = {
-  critical: {
-    total: 8,
-    reopen: 1,
-    closed: 2,
-    new: 2,
-    reject: 1,
-    open: 1,
-    duplicate: 0,
-    fixed: 1,
-  },
-  blocker: {
-    total: 6,
-    reopen: 0,
-    closed: 2,
-    new: 1,
-    reject: 1,
-    open: 1,
-    duplicate: 0,
-    fixed: 1,
-  },
-  high: {
-    total: 12,
-    reopen: 2,
-    closed: 4,
-    new: 3,
-    reject: 1,
-    open: 1,
-    duplicate: 0,
-    fixed: 1,
-  },
-  medium: {
-    total: 8,
-    reopen: 1,
-    closed: 3,
-    new: 2,
-    reject: 0,
-    open: 1,
-    duplicate: 1,
-    fixed: 0,
-  },
-  low: {
-    total: 5,
-    reopen: 0,
-    closed: 2,
-    new: 1,
-    reject: 1,
-    open: 1,
-    duplicate: 0,
-    fixed: 0,
-  },
-  minor: {
-    total: 3,
-    reopen: 0,
-    closed: 1,
-    new: 1,
-    reject: 0,
-    open: 1,
-    duplicate: 0,
-    fixed: 0,
-  },
-  
-};
