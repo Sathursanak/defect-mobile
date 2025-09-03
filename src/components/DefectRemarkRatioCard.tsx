@@ -20,7 +20,8 @@ const DefectRemarkRatioCard: React.FC<DefectRemarkRatioCardProps> = ({
   // Calculate percentage from inputs only if backend override is missing
   // remarkCount is total defects; percent = valid / total * 100
   const denominator = remarkCount;
-  const fallbackPercent = denominator > 0 ? (defectCount / denominator) * 100 : 0;
+  // Handle 0/0 case as 100% (green) for new projects
+  const fallbackPercent = denominator > 0 ? (defectCount / denominator) * 100 : 100;
   const percentage = percentOverride ?? fallbackPercent;
   const displayPercentage = (percentage ?? 0).toFixed(2);
 

@@ -76,7 +76,7 @@ const DefectDistributionChart: React.FC<DefectDistributionChartProps> = ({
         <Text style={[styles.total, { marginTop: 8 }]}>
           {totalValidDefects} Total Valid Defects
         </Text>
-        
+
       </View>
     </View>
   );
